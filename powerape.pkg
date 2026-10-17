@@ -1,0 +1,72 @@
+* powerape.pkg -- package-description file for the powerape Stata port
+* Install:  net install powerape, from("https://raw.githubusercontent.com/jespernwulff/powerape-stata/main/")
+* Extras:   net get powerape, from(...)   (ancillary: showcase.do, a guided tour, and build.do)
+* Then:     mata: mata mlib index
+v 3
+d 'POWERAPE': module for power analysis for average partial effects (APE) and average interaction effects (AIE)
+d
+d powerape is a Stata port of the R package powerape (version 1.11.3,
+d https://github.com/jespernwulff/powerape): simulation-based power analysis
+d in which the effect size of interest is the average partial effect or the
+d average interaction effect of a probit or logit model, stated in probability
+d points. The package calibrates the data-generating process (baseline rate
+d plus nuisance signal), inverts the target into coefficients, checks
+d feasibility, and computes power for three confidence-interval claims
+d (detect / minimum-effect / equivalence), power curves, required sample
+d sizes with a confirmation stage, minimum detectable effects, robustness
+d sweeps with n_max, citable power statements, and justified error rates.
+d Routes: parametric covariates, covariates resampled from pilot data, a
+d fitted probit/logit pilot model, correlated random effects panel probit,
+d and an endogenous focal variable (control-function probit, cfprobit).
+d
+d Requirements: Stata 16 or later (frames). The default engine(stata) on the
+d IV route calls cfprobit (Stata 18 or later); engine(mata) covers every route
+d on Stata 16 or later. Tested on StataNow 19.5 (update 14 Oct 2026) only. The
+d shipped Mata library lpowerape.mlib was compiled by StataNow 19.5; a Mata
+d library compiled by a newer Stata may not load in an older one, so on Stata
+d 16-18 rebuild it from the .mata sources (net get powerape, then do build.do)
+d and run mata: mata mlib index. After installing, run -powerape version- to
+d check that the ado-file and the Mata library match.
+d
+d Version 0.1.3 (17 October 2026): panel designs calibrate about as fast as
+d in the R package (a panel dgp, setape or trueape at the default nint(1e5)
+d took about a minute and now takes one to three seconds); every result is
+d identical to 0.1.2.
+d
+d Version 0.1.2 (16 October 2026): every simulation command prints a line
+d "fit: ..." naming who fitted the simulated studies (for example probit via
+d engine(stata), effects(closed), or Mata engine (Fisher scoring)) and stores
+d it in r(fit), r(engine) and r(effects).
+d
+d KW: power analysis
+d KW: sample size
+d KW: average partial effect
+d KW: average marginal effect
+d KW: interaction effect
+d KW: probit
+d KW: logit
+d KW: control function
+d KW: simulation
+d
+d Requires: Stata version 16
+d
+d Distribution-Date: 20261017
+d
+d Author: Jesper N. Wulff, Aarhus University
+d Support: https://github.com/jespernwulff/powerape-stata/issues
+d Documentation, in Stata and R: https://jespernwulff.github.io/powerape/
+d
+f ado/powerape.ado
+f ado/powerape.sthlp
+f ado/lpowerape.mlib
+f ado/powerape_core.mata
+f ado/powerape_structs.mata
+f ado/powerape_engine.mata
+f ado/powerape_panel.mata
+f ado/powerape_iv.mata
+f ado/powerape_stata_engine.mata
+f ado/powerape_search.mata
+f ado/powerape_cmd.mata
+f build.do
+f examples/showcase.do
+e

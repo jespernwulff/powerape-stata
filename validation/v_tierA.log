@@ -1,0 +1,294 @@
+
+. di as txt "powerape `pav'; Stata `c(stata_version)' (`c(born_date)')"
+powerape 0.1.3 (Stata port of powerape 1.11.3); Stata 19.5 (14 Oct 2026)
+
+. 
+. mata:
+------------------------------------------------- mata (type end to exit) -----
+: // port of exact_power_sat (helper-exact.R)
+: real scalar exact_power_sat(real scalar n, real scalar pd, real scalar p0, re
+> al scalar p1,
+>     real scalar conf, string scalar claim, real scalar sesoi, string scalar s
+> eparation)
+> {
+>     real scalar z, total, n1, n0, pn1, c1, c0
+>     real colvector x1, x0, p1h, p0h
+>     real matrix est, se, dec, w, bad
+>     z = invnormal(1 - (1 - conf) / 2)
+>     total = 0
+>     for (n1 = 0; n1 <= n; n1++) {
+>         pn1 = binomialp(n, n1, pd)
+>         if (pn1 < 1e-14) continue
+>         n0 = n - n1
+>         if (n1 == 0 | n0 == 0) continue
+>         if (separation == "fail") {
+>             if (n1 < 2 | n0 < 2) continue
+>             x1 = (1::(n1 - 1)); x0 = (1::(n0 - 1))
+>         }
+>         else {
+>             x1 = (0::n1); x0 = (0::n0)
+>         }
+>         p1h = x1 :/ n1; p0h = x0 :/ n0
+>         c1 = rows(p1h); c0 = rows(p0h)
+>         est = p1h * J(1, c0, 1) - J(c1, 1, 1) * p0h'
+>         se = sqrt((p1h :* (1 :- p1h) :/ n1) * J(1, c0, 1) + J(c1, 1, 1) * (p0
+> h :* (1 :- p0h) :/ n0)')
+>         if (claim == "detect") dec = (est :- z :* se :> 0)
+>         else if (claim == "minimum") dec = (est :- z :* se :> sesoi)
+>         else dec = (est :+ z :* se :< sesoi) :& (est :- z :* se :> -sesoi)
+>         if (separation == "keep") {
+>             bad = ((x1 :== 0) * (x0 :== 0)') :| ((x1 :== n1) * (x0 :== n0)')
+>             dec = dec :& !bad
+>         }
+>         w = binomialp(n1, x1, p1) * binomialp(n0, x0, p0)'
+>         total = total + pn1 * sum(w :* dec)
+>     }
+>     return(total)
+> }
+
+: RES = J(0, 1, "")
+
+: NP = 0; NF = 0
+
+: void reca(string scalar label, real scalar sim, real scalar ex, real scalar n
+> sim)
+> {
+>     external string colvector RES
+>     external real scalar NP, NF
+>     real scalar mcse, ok
+>     mcse = sqrt(max((ex * (1 - ex), 1e-6)) / nsim)
+>     ok = (abs(sim - ex) <= 4 * mcse + 1e-4)
+>     RES = RES \ sprintf("%-52s exact %7.4f  simulated %7.4f  MCSE %6.4f  |dif
+> f| %6.4f  %s", label, ex, sim, mcse, abs(sim - ex), (ok ? "PASS" : "FAIL"))
+>     if (ok) NP++
+>     else NF++
+> }
+
+: end
+-------------------------------------------------------------------------------
+
+. 
+. * the V1 design: probit, p(focal) .5, baseline .30, APE .10 (p1 .40), n = 712
+. powerape dgp d10, focal(t, binary p(0.5)) baseline(0.30) nodisplay
+
+. powerape setape d10, target(0.10) nodisplay
+
+. powerape dgp d00, focal(t, binary p(0.5)) baseline(0.30) nodisplay
+
+. powerape setape d00, target(0) nodisplay
+
+. 
+. * Mata engine at nsim = 40,000 (as the R battery)
+. mata: ex = exact_power_sat(712, .5, .30, .40, .95, "detect", ., "fail")
+
+. powerape power d10, n(712) claim(detect) nsim(40000) seed(1) engine(mata) nod
+> isplay nodraws
+
+. mata: reca("V1 detect, n = 712, engine(mata), nsim 40000", st_numscalar("r(po
+> wer)"), ex, 40000)
+
+. mata: ex = exact_power_sat(712, .5, .30, .40, .90, "minimum", .04, "fail")
+
+. powerape power d10, n(712) claim(minimum) sesoi(0.04) nsim(40000) seed(2) eng
+> ine(mata) nodisplay nodraws
+
+. mata: reca("V1 minimum (sesoi .04), engine(mata), nsim 40000", st_numscalar("
+> r(power)"), ex, 40000)
+
+. mata: ex = exact_power_sat(712, .5, .30, .30, .90, "equivalence", .05, "fail"
+> )
+
+. powerape power d00, n(712) claim(equivalence) sesoi(0.05) nsim(40000) seed(3)
+>  engine(mata) nodisplay nodraws
+
+. mata: reca("V1 equivalence (sesoi .05, truth 0), engine(mata)", st_numscalar(
+> "r(power)"), ex, 40000)
+
+. mata: ex = exact_power_sat(712, .5, .30, .30, .90, "equivalence", .07, "fail"
+> )
+
+. powerape power d00, n(712) claim(equivalence) sesoi(0.07) nsim(40000) seed(4)
+>  engine(mata) nodisplay nodraws
+
+. mata: reca("equivalence (sesoi .07, truth 0), engine(mata)", st_numscalar("r(
+> power)"), ex, 40000)
+
+. 
+. * Stata engine (probit in the loop) at nsim = 4,000
+. mata: ex = exact_power_sat(712, .5, .30, .40, .95, "detect", ., "fail")
+
+. powerape power d10, n(712) claim(detect) nsim(4000) seed(5) engine(stata) nod
+> isplay nodraws
+
+. mata: reca("V1 detect, n = 712, engine(stata), nsim 4000", st_numscalar("r(po
+> wer)"), ex, 4000)
+
+. mata: ex = exact_power_sat(712, .5, .30, .40, .90, "minimum", .04, "fail")
+
+. powerape power d10, n(712) claim(minimum) sesoi(0.04) nsim(4000) seed(6) engi
+> ne(stata) nodisplay nodraws
+
+. mata: reca("V1 minimum (sesoi .04), engine(stata), nsim 4000", st_numscalar("
+> r(power)"), ex, 4000)
+
+. * margins in the loop at nsim = 1,000
+. mata: ex = exact_power_sat(712, .5, .30, .40, .95, "detect", ., "fail")
+
+. powerape power d10, n(712) claim(detect) nsim(1000) seed(7) engine(stata) eff
+> ects(margins) nodisplay nodraws
+
+. mata: reca("V1 detect, engine(stata) effects(margins), nsim 1000", st_numscal
+> ar("r(power)"), ex, 1000)
+
+. 
+. * rare outcome, protective effect: .05 -> .01 at n = 300 (separation matters)
+. powerape dgp drare, focal(t, binary p(0.5)) baseline(0.05) nodisplay
+
+. powerape setape drare, target(-0.04) nodisplay
+
+. mata: ex = exact_power_sat(300, .5, .01, .05, .95, "detect", ., "fail")
+
+. powerape power drare, n(300) claim(detect) nsim(20000) seed(8) engine(mata) n
+> odisplay nodraws separation(fail)
+warning: 22.4% of simulated studies had separation (a focal cell with no events
+>  or no non-events, where the maximum-likelihood effect does not exist); they 
+> count as failed (separation(fail), the default; Stata's probit also refuses s
+> uch fits); the smallest focal cell averages 1.5 events (or non-events) per si
+> mulated study; delta-method Wald inference is unreliable at this sparsity (on
+> e-sided error rates can run up to about twice nominal, in the direction in wh
+> ich the sparse cell has the lower rate). See help powerape, section 'Separati
+> on and sparse cells'.
+
+. mata: reca("rare .05->.01, n = 300, separation(fail), engine(mata)", st_numsc
+> alar("r(power)"), ex, 20000)
+
+. mata: st_local("sepd", strofreal(st_numscalar("r(separated)")))
+
+. di as txt "share of simulated studies with separation: `sepd' (R: > .15)"
+share of simulated studies with separation: .22395 (R: > .15)
+
+. mata: ex = exact_power_sat(300, .5, .01, .05, .95, "detect", ., "keep")
+
+. powerape power drare, n(300) claim(detect) nsim(20000) seed(9) engine(mata) n
+> odisplay nodraws separation(keep)
+warning: 21.8% of simulated studies had separation (a focal cell with no events
+>  or no non-events, where the maximum-likelihood effect does not exist); they 
+> were kept with their degenerate Wald intervals (separation(keep)); the smalle
+> st focal cell averages 1.5 events (or non-events) per simulated study; delta-
+> method Wald inference is unreliable at this sparsity (one-sided error rates c
+> an run up to about twice nominal, in the direction in which the sparse cell h
+> as the lower rate). See help powerape, section 'Separation and sparse cells'.
+
+. mata: reca("rare .05->.01, n = 300, separation(keep), engine(mata)", st_numsc
+> alar("r(power)"), ex, 20000)
+
+. mata: ex = exact_power_sat(300, .5, .01, .05, .95, "detect", ., "fail")
+
+. powerape power drare, n(300) claim(detect) nsim(4000) seed(10) engine(stata) 
+> nodisplay nodraws separation(fail)
+warning: 23.1% of simulated studies had separation (a focal cell with no events
+>  or no non-events, where the maximum-likelihood effect does not exist); they 
+> count as failed (separation(fail), the default; Stata's probit also refuses s
+> uch fits); the smallest focal cell averages 1.4 events (or non-events) per si
+> mulated study; delta-method Wald inference is unreliable at this sparsity (on
+> e-sided error rates can run up to about twice nominal, in the direction in wh
+> ich the sparse cell has the lower rate). See help powerape, section 'Separati
+> on and sparse cells'.
+
+. mata: reca("rare .05->.01, n = 300, separation(fail), engine(stata)", st_nums
+> calar("r(power)"), ex, 4000)
+
+. * 0.1.1: the Stata engine keeps the asis fit's separated coefficient (zero va
+> riance
+. * row), so separation(keep) now scores the degenerate interval as R's glm doe
+> s
+. mata: ex = exact_power_sat(300, .5, .01, .05, .95, "detect", ., "keep")
+
+. powerape power drare, n(300) claim(detect) nsim(4000) seed(10) engine(stata) 
+> nodisplay nodraws separation(keep)
+warning: 23.1% of simulated studies had separation (a focal cell with no events
+>  or no non-events, where the maximum-likelihood effect does not exist); they 
+> were kept with their degenerate Wald intervals (separation(keep)); the smalle
+> st focal cell averages 1.4 events (or non-events) per simulated study; delta-
+> method Wald inference is unreliable at this sparsity (one-sided error rates c
+> an run up to about twice nominal, in the direction in which the sparse cell h
+> as the lower rate). See help powerape, section 'Separation and sparse cells'.
+
+. mata: reca("rare .05->.01, n = 300, separation(keep), engine(stata)", st_nums
+> calar("r(power)"), ex, 4000)
+
+. mata: st_local("nfail", strofreal(st_numscalar("r(n_failed)")))
+
+. di as txt "separation(keep), engine(stata): replications failed to fit: `nfai
+> l' (asis fits not converged or omitted terms)"
+separation(keep), engine(stata): replications failed to fit: 2 (asis fits not c
+> onverged or omitted terms)
+
+. 
+. * logit gives the identical saturated-case decisions on the same seed
+. powerape dgp dl, model(logit) focal(t, binary p(0.5)) baseline(0.30) nodispla
+> y
+
+. powerape setape dl, target(0.10) nodisplay
+
+. powerape power dl, n(500) claim(detect) nsim(2000) seed(11) engine(mata) nodi
+> splay nodraws
+
+. local pl = r(power)
+
+. powerape power d10, n(500) claim(detect) nsim(2000) seed(11) engine(mata) nod
+> isplay nodraws
+
+. mata: reca("probit = logit, saturated case, same seed", `pl', st_numscalar("r
+> (power)"), 1e12)
+
+. 
+. mata:
+------------------------------------------------- mata (type end to exit) -----
+: printf("\n")
+
+
+: for (j = 1; j <= rows(RES); j++) printf("{txt}%s\n", RES[j])
+V1 detect, n = 712, engine(mata), nsim 40000         exact  0.8018  simulated  
+> 0.8059  MCSE 0.0020  |diff| 0.0041  PASS
+V1 minimum (sesoi .04), engine(mata), nsim 40000     exact  0.5175  simulated  
+> 0.5163  MCSE 0.0025  |diff| 0.0012  PASS
+V1 equivalence (sesoi .05, truth 0), engine(mata)    exact  0.0000  simulated  
+> 0.0000  MCSE 0.0000  |diff| 0.0000  PASS
+equivalence (sesoi .07, truth 0), engine(mata)       exact  0.3060  simulated  
+> 0.3068  MCSE 0.0023  |diff| 0.0008  PASS
+V1 detect, n = 712, engine(stata), nsim 4000         exact  0.8018  simulated  
+> 0.8030  MCSE 0.0063  |diff| 0.0012  PASS
+V1 minimum (sesoi .04), engine(stata), nsim 4000     exact  0.5175  simulated  
+> 0.5102  MCSE 0.0079  |diff| 0.0073  PASS
+V1 detect, engine(stata) effects(margins), nsim 1000 exact  0.8018  simulated  
+> 0.8040  MCSE 0.0126  |diff| 0.0022  PASS
+rare .05->.01, n = 300, separation(fail), engine(mata) exact  0.3503  simulated
+>   0.3496  MCSE 0.0034  |diff| 0.0007  PASS
+rare .05->.01, n = 300, separation(keep), engine(mata) exact  0.5602  simulated
+>   0.5619  MCSE 0.0035  |diff| 0.0017  PASS
+rare .05->.01, n = 300, separation(fail), engine(stata) exact  0.3503  simulate
+> d  0.3490  MCSE 0.0075  |diff| 0.0013  PASS
+rare .05->.01, n = 300, separation(keep), engine(stata) exact  0.5602  simulate
+> d  0.5705  MCSE 0.0078  |diff| 0.0103  PASS
+probit = logit, saturated case, same seed            exact  0.6640  simulated  
+> 0.6640  MCSE 0.0000  |diff| 0.0000  PASS
+
+: printf("\n{txt}Tier A: %f PASS, %f FAIL\n", NP, NF)
+
+Tier A: 12 PASS, 0 FAIL
+
+: unlink("tierA-results.txt")
+
+: fh = fopen("tierA-results.txt", "w")
+
+: for (j = 1; j <= rows(RES); j++) fput(fh, RES[j])
+
+: fput(fh, sprintf("Tier A: %f PASS, %f FAIL", NP, NF))
+
+: fclose(fh)
+
+: end
+-------------------------------------------------------------------------------
+
+. log close tier

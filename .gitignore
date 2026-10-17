@@ -1,0 +1,28 @@
+# The public repository (github.com/jespernwulff/powerape-stata) holds the
+# package, its examples, the regression tests and the validation: scripts,
+# data, results and logs, all run from the repository root. Everything else
+# in this folder (debug probes, smoke tests, local logs) stays local: this
+# file allows only what is listed below.
+/*
+!/.gitignore
+!/README.md
+!/LICENSE
+!/stata.toc
+!/powerape.pkg
+!/build.do
+!/ado/
+!/examples/
+/examples/*.log
+!/tests/
+/tests/*
+!/tests/run-tests.do
+!/validation/
+/validation/*
+!/validation/RESULTS.md
+!/validation/v_tier?.do
+!/validation/v_tier?.log
+!/validation/tier?-results.txt
+!/validation/export_fixtures.R
+!/validation/tierD_r.R
+!/validation/tierD_r.log
+!/validation/data/

@@ -1,0 +1,172 @@
+A        b1             R fit_index_model           -0.62976429    -0.62976429   1.58e-10  1.0e-06 PASS
+A        b2             R fit_index_model            0.34240818     0.34240818   2.19e-10  1.0e-06 PASS
+A        b3             R fit_index_model            0.46383089     0.46383089   1.78e-09  1.0e-06 PASS
+A        b4             R fit_index_model            0.20586127     0.20586127   7.45e-11  1.0e-06 PASS
+A        jac1           R ape_binary_est             0.03453960     0.03453960   8.03e-11  1.0e-06 PASS
+A        jac2           R ape_binary_est             0.35213447     0.35213447   2.16e-10  1.0e-06 PASS
+A        jac3           R ape_binary_est            -0.04067963    -0.04067963   1.11e-11  1.0e-06 PASS
+A        jac4           R ape_binary_est             0.00973038     0.00973038   1.30e-11  1.0e-06 PASS
+A        ape            R ape_binary_est             0.11546447     0.11546447   1.36e-10  1.0e-07 PASS
+A        se_model       R vcov_from_glmfit           0.02011673     0.02011672   6.27e-09  1.0e-06 PASS
+A        se_robust      R vcov_sandwich HC0          0.02012119     0.02012117   1.24e-08  1.0e-06 PASS
+A        ape            Stata probit+margins         0.11546447     0.11546447   4.91e-09  1.0e-06 PASS
+A        se_model       Stata margins (OIM)          0.02011473     0.02011672   2.00e-06  1.0e-02 PASS
+A        se_robust      Stata vce(robust) (OIM)      0.02012008     0.02012117   1.09e-06  1.0e-02 PASS
+A        b2 (engine stata) R fit_index_model            0.34240819     0.34240818   1.64e-08  1.0e-05 PASS
+A        ape (engine stata) R ape_binary_est             0.11546447     0.11546447   4.91e-09  1.0e-06 PASS
+A        se_model (engine stata) Stata margins (OIM)          0.02011473     0.02011473   0.00e+00  1.0e-02 PASS
+B        b1             R fit_index_model           -1.33531400    -1.33531401   5.97e-09  1.0e-06 PASS
+B        b2             R fit_index_model            0.41979874     0.41979874   2.65e-09  1.0e-06 PASS
+B        b3             R fit_index_model            0.51631919     0.51631919   1.06e-09  1.0e-06 PASS
+B        b4             R fit_index_model            0.29046489     0.29046489   2.62e-09  1.0e-06 PASS
+B        jac1           R ape_cont_est               0.01142068     0.01142068   6.52e-11  1.0e-06 PASS
+B        jac2           R ape_cont_est               0.22975695     0.22975695   1.88e-11  1.0e-06 PASS
+B        jac3           R ape_cont_est              -0.01707309    -0.01707309   7.76e-11  1.0e-06 PASS
+B        jac4           R ape_cont_est               0.00204007     0.00204007   5.46e-12  1.0e-06 PASS
+B        ape            R ape_cont_est               0.09265508     0.09265508   5.70e-10  1.0e-07 PASS
+B        se_model       R vcov_from_glmfit           0.01011361     0.01011361   1.42e-09  1.0e-06 PASS
+B        se_robust      R vcov_sandwich HC0          0.00997625     0.00997625   2.81e-09  1.0e-06 PASS
+B        ape            Stata logit+margins          0.09265507     0.09265508   2.02e-09  1.0e-06 PASS
+B        se_model       Stata margins (logit OIM=EIM)     0.01011361     0.01011361   1.44e-09  1.0e-05 PASS
+B        se_robust      Stata vce(robust) (N/(N-1))     0.00997875     0.00997625   2.50e-06  1.0e-03 PASS
+C        b1             R fit_index_model           -0.53023765    -0.53023765   1.77e-10  1.0e-06 PASS
+C        b2             R fit_index_model            0.46070928     0.46070928   6.38e-10  1.0e-06 PASS
+C        b3             R fit_index_model            0.44624476     0.44624476   1.12e-10  1.0e-06 PASS
+C        b4             R fit_index_model            0.19035060     0.19035060   1.85e-10  1.0e-06 PASS
+C        b5             R fit_index_model            0.38590295     0.38590295   2.97e-10  1.0e-06 PASS
+C        jac1           R aie_est                   -0.08878317    -0.08878317   7.47e-11  1.0e-06 PASS
+C        jac2           R aie_est                   -0.04673466    -0.04673466   5.41e-11  1.0e-06 PASS
+C        jac3           R aie_est                   -0.04635711    -0.04635711   4.12e-11  1.0e-06 PASS
+C        jac4           R aie_est                    0.32393195     0.32393195   6.78e-11  1.0e-06 PASS
+C        jac5           R aie_est                   -0.02202825    -0.02202825   1.09e-11  1.0e-06 PASS
+C        aie            R aie_est                    0.06940320     0.06940320   8.00e-11  1.0e-07 PASS
+C        se_model       R vcov_from_glmfit           0.04131092     0.04131010   8.24e-07  1.0e-06 PASS
+C        aie            Stata ginteff                0.06940378     0.06940320   5.80e-07  1.0e-06 PASS
+C        se_model       Stata ginteff (OIM)          0.04129377     0.04131010   1.63e-05  1.0e-02 PASS
+D        b1             R fit_index_model           -0.38851189    -0.38851189   3.84e-10  1.0e-06 PASS
+D        b2             R fit_index_model            0.35692822     0.35692822   2.50e-09  1.0e-06 PASS
+D        b3             R fit_index_model            0.23799846     0.23799846   8.50e-10  1.0e-06 PASS
+D        b4             R fit_index_model            0.30580242     0.30580243   4.65e-09  1.0e-06 PASS
+D        b5             R fit_index_model            0.36509832     0.36509831   9.69e-10  1.0e-06 PASS
+D        jac1           R aie_est                   -0.01648309    -0.01648309   3.43e-10  1.0e-06 PASS
+D        jac2           R aie_est                   -0.07539489    -0.07539489   1.18e-09  1.0e-06 PASS
+D        jac3           R aie_est                    0.01988841     0.01988841   2.11e-10  1.0e-06 PASS
+D        jac4           R aie_est                    0.22768811     0.22768811   4.61e-10  1.0e-06 PASS
+D        jac5           R aie_est                   -0.02006830    -0.02006830   1.62e-10  1.0e-06 PASS
+D        aie            R aie_est                    0.08924539     0.08924539   1.29e-09  1.0e-07 PASS
+D        se_model       R vcov_from_glmfit           0.01779038     0.01779038   1.82e-09  1.0e-06 PASS
+D        aie            Stata ginteff                0.08924538     0.08924539   6.63e-09  1.0e-06 PASS
+D        se_model       Stata ginteff (OIM)          0.01780748     0.01779038   1.71e-05  1.0e-02 PASS
+E        b1             R fit_index_model           -0.42193359    -0.42193359   6.97e-10  1.0e-06 PASS
+E        b2             R fit_index_model            0.42758636     0.42758636   4.94e-10  1.0e-06 PASS
+E        b3             R fit_index_model            0.22646173     0.22646173   3.50e-09  1.0e-06 PASS
+E        b4             R fit_index_model            0.30808500     0.30808500   3.17e-11  1.0e-06 PASS
+E        b5             R fit_index_model            0.42829720     0.42829720   4.18e-10  1.0e-06 PASS
+E        jac1           R aie_est                   -0.01032595    -0.01032595   1.35e-10  1.0e-06 PASS
+E        jac2           R aie_est                   -0.00140528    -0.00140528   7.40e-12  1.0e-06 PASS
+E        jac3           R aie_est                   -0.02385528    -0.02385528   7.77e-11  1.0e-06 PASS
+E        jac4           R aie_est                    0.19970154     0.19970154   3.09e-10  1.0e-06 PASS
+E        jac5           R aie_est                   -0.01143278    -0.01143278   1.47e-11  1.0e-06 PASS
+E        aie            R aie_est                    0.06854919     0.06854919   7.25e-11  1.0e-07 PASS
+E        se_model       R vcov_from_glmfit           0.02034487     0.02034487   5.61e-09  1.0e-06 PASS
+E        aie            Stata ginteff                0.06854918     0.06854919   1.79e-09  1.0e-06 PASS
+E        se_model       Stata ginteff (OIM=EIM)      0.02034487     0.02034487   5.65e-09  1.0e-05 PASS
+F        b1             R fit_index_model           -0.44230438    -0.44230438   3.00e-10  1.0e-06 PASS
+F        b2             R fit_index_model            0.32936462     0.32936462   1.13e-09  1.0e-06 PASS
+F        b3             R fit_index_model            0.23733949     0.23733949   9.44e-10  1.0e-06 PASS
+F        b4             R fit_index_model            0.32513511     0.32513511   3.46e-10  1.0e-06 PASS
+F        b5             R fit_index_model            0.38439330     0.38439331   1.65e-09  1.0e-06 PASS
+F        jac1           R aie_est                    0.01388734     0.01388734   6.77e-11  1.0e-06 PASS
+F        jac2           R aie_est                   -0.02754145    -0.02754145   2.61e-10  1.0e-06 PASS
+F        jac3           R aie_est                   -0.00642374    -0.00642374   7.46e-11  1.0e-06 PASS
+F        jac4           R aie_est                    0.22758356     0.22758356   3.42e-10  1.0e-06 PASS
+F        jac5           R aie_est                   -0.01839312    -0.01839312   6.93e-11  1.0e-06 PASS
+F        aie            R aie_est                    0.09424398     0.09424398   1.18e-12  1.0e-07 PASS
+F        se_model       R vcov_from_glmfit           0.00776462     0.00776430   3.21e-07  1.0e-06 PASS
+F        aie            Stata ginteff                0.09424426     0.09424398   2.79e-07  1.0e-06 PASS
+F        se_model       Stata ginteff (OIM)          0.00782126     0.00776430   5.70e-05  1.0e-02 PASS
+G        b1             R fit_index_model           -0.42699136    -0.42699136   8.49e-10  1.0e-06 PASS
+G        b2             R fit_index_model            0.31414977     0.31414977   5.83e-10  1.0e-06 PASS
+G        b3             R fit_index_model            0.22878030     0.22878030   9.26e-10  1.0e-06 PASS
+G        b4             R fit_index_model            0.11711627     0.11711626   8.08e-09  1.0e-06 PASS
+G        ape            R ape_binary_est             0.11676559     0.11676559   2.88e-10  1.0e-07 PASS
+G        se_model       R vcov_from_glmfit           0.04274542     0.04274545   2.90e-08  1.0e-06 PASS
+G        se_cluster     R vcov_cluster G/(G-1)       0.04213281     0.04213287   5.77e-08  1.0e-06 PASS
+G        ape            Stata probit+margins         0.11676563     0.11676559   4.95e-08  1.0e-06 PASS
+G        se_cluster     Stata vce(cluster) (OIM)     0.04215532     0.04213287   2.25e-05  2.0e-02 PASS
+H_lin    theta1         R cf_fit                    -0.33502152    -0.33502152   1.30e-11  1.0e-06 PASS
+H_lin    theta2         R cf_fit                     0.61051958     0.61051958   1.88e-12  1.0e-06 PASS
+H_lin    theta3         R cf_fit                     0.43590748     0.43590748   1.38e-09  1.0e-06 PASS
+H_lin    theta4         R cf_fit                     0.55450953     0.55450953   3.08e-09  1.0e-06 PASS
+H_lin    se_theta1      R cf_fit stacked vcov        0.04996611     0.04996611   1.63e-11  1.0e-06 PASS
+H_lin    se_theta2      R cf_fit stacked vcov        0.07592708     0.07592708   3.37e-13  1.0e-06 PASS
+H_lin    se_theta3      R cf_fit stacked vcov        0.05597084     0.05597084   5.87e-11  1.0e-06 PASS
+H_lin    se_theta4      R cf_fit stacked vcov        0.08615353     0.08615353   1.71e-10  1.0e-06 PASS
+H_lin    ape            R cf_ape_est                 0.14121206     0.14121206   1.53e-10  1.0e-07 PASS
+H_lin    se             R cf_ape_est                 0.01636334     0.01636334   2.86e-11  1.0e-06 PASS
+H_lin_cl se             R cf_fit cluster             0.01607010     0.01607010   1.00e-10  1.0e-06 PASS
+H_prb    theta1         R cf_fit                    -0.32932312    -0.32932312   2.30e-10  1.0e-06 PASS
+H_prb    theta2         R cf_fit                     0.74546525     0.74546525   8.62e-10  1.0e-06 PASS
+H_prb    theta3         R cf_fit                     0.47675445     0.47675445   1.09e-09  1.0e-06 PASS
+H_prb    theta4         R cf_fit                     0.51444130     0.51444130   4.99e-10  1.0e-06 PASS
+H_prb    se_theta1      R cf_fit stacked vcov        0.09898862     0.09898862   2.02e-10  1.0e-06 PASS
+H_prb    se_theta2      R cf_fit stacked vcov        0.16282490     0.16282490   3.20e-10  1.0e-06 PASS
+H_prb    se_theta3      R cf_fit stacked vcov        0.04764598     0.04764598   2.35e-11  1.0e-06 PASS
+H_prb    se_theta4      R cf_fit stacked vcov        0.11353369     0.11353369   3.18e-10  1.0e-06 PASS
+H_prb    ape            R cf_ape_est                 0.24863260     0.24863260   4.03e-10  1.0e-07 PASS
+H_prb    se             R cf_ape_est                 0.06023496     0.06023496   1.48e-10  1.0e-06 PASS
+H_aie    theta1         R cf_fit                    -0.51779340    -0.51779340   4.26e-09  1.0e-06 PASS
+H_aie    theta2         R cf_fit                     0.80423018     0.80423017   7.74e-09  1.0e-06 PASS
+H_aie    theta3         R cf_fit                     0.56080463     0.56080462   5.12e-09  1.0e-06 PASS
+H_aie    theta4         R cf_fit                    -0.01030022    -0.01030021   8.82e-09  1.0e-06 PASS
+H_aie    theta5         R cf_fit                     0.44643122     0.44643122   1.20e-09  1.0e-06 PASS
+H_aie    theta6         R cf_fit                     0.44240447     0.44240447   6.84e-09  1.0e-06 PASS
+H_aie    theta7         R cf_fit                     0.14073153     0.14073152   9.00e-09  1.0e-06 PASS
+H_aie    se_theta1      R cf_fit stacked vcov        0.12483579     0.12483579   2.25e-10  1.0e-06 PASS
+H_aie    se_theta2      R cf_fit stacked vcov        0.19724018     0.19724018   3.43e-10  1.0e-06 PASS
+H_aie    se_theta3      R cf_fit stacked vcov        0.17943364     0.17943364   1.15e-10  1.0e-06 PASS
+H_aie    se_theta4      R cf_fit stacked vcov        0.29987443     0.29987443   3.22e-10  1.0e-06 PASS
+H_aie    se_theta5      R cf_fit stacked vcov        0.04736123     0.04736123   7.22e-11  1.0e-06 PASS
+H_aie    se_theta6      R cf_fit stacked vcov        0.13634297     0.13634297   1.78e-10  1.0e-06 PASS
+H_aie    se_theta7      R cf_fit stacked vcov        0.21152197     0.21152197   6.06e-10  1.0e-06 PASS
+H_aie    aie            R cf_aie_est                -0.02800078    -0.02800078   3.33e-09  1.0e-07 PASS
+H_aie    se             R cf_aie_est                 0.10225680     0.10225680   1.15e-10  1.0e-06 PASS
+H_lin    theta2 (y2)    Stata cfprobit               0.61051961     0.61051958   3.01e-08  1.0e-05 PASS
+H_lin    theta4 (cf)    Stata cfprobit               0.55450949     0.55450953   4.42e-08  1.0e-05 PASS
+H_lin    se_theta2      Stata cfprobit vce(robust)     0.07592708     0.07592708   7.91e-10  1.0e-05 PASS
+H_lin    se_theta4      Stata cfprobit vce(robust)     0.08615353     0.08615353   1.96e-09  1.0e-05 PASS
+H_lin    ape            Stata cfprobit+margins       0.14121207     0.14121206   9.05e-09  1.0e-06 PASS
+H_lin    se             Stata cfprobit+margins       0.01636334     0.01636334   9.91e-10  1.0e-05 PASS
+H_lin_cl se             Stata cfprobit vce(cluster)+margins     0.01607010     0.01607010   1.12e-09  1.0e-05 PASS
+H_prb    theta2 (1.y2b) Stata cfprobit               0.74546434     0.74546525   9.08e-07  1.0e-04 PASS
+H_prb    ape            Stata cfprobit+margins       0.24863209     0.24863260   5.04e-07  1.0e-05 PASS
+H_prb    se             Stata cfprobit+margins       0.06023488     0.06023496   7.20e-08  1.0e-05 PASS
+H_aie    theta2 (1.y2b) Stata cfprobit interact()     0.80422782     0.80423017   2.35e-06  1.0e-04 PASS
+H_aie    theta4 (y2b#m) Stata cfprobit interact()    -0.01030088    -0.01030021   6.70e-07  1.0e-04 PASS
+H_aie    aie (engine stata) R cf_aie_est                -0.02800083    -0.02800078   5.65e-08  1.0e-05 PASS
+H_aie    se (engine stata) R cf_aie_est                 0.10225667     0.10225680   1.28e-07  1.0e-05 PASS
+H_aie    aie (margins dydx at) R cf_aie_est                -0.02800082    -0.02800078   4.27e-08  1.0e-06 PASS
+H_aie    se (margins dydx at) R cf_aie_est                 0.10225667     0.10225680   1.29e-07  1.0e-06 PASS
+H_aie_c  aie (engine stata) R port cf_aie_est           -0.00469555    -0.00469554   1.27e-08  1.0e-05 PASS
+H_aie_c  se (engine stata) R port cf_aie_est            0.02723117     0.02723118   7.14e-10  1.0e-05 PASS
+H_aie_c  aie (margins dydx at) R port cf_aie_est           -0.00469555    -0.00469554   1.27e-08  1.0e-06 PASS
+H_aie_c  se (margins dydx at) R port cf_aie_est            0.02723118     0.02723118   3.76e-09  1.0e-06 PASS
+sep_sat  fit ok (asis)  engine mata ok               1.00000000     1.00000000   0.00e+00  0.0e+00 PASS
+sep_sat  V[t,t] zero kept rank k-1                     1.00000000     1.00000000   0.00e+00  0.0e+00 PASS
+sep_sat  ape (asis)     engine mata (R glm)         -0.05998916    -0.06000000   1.08e-05  1.0e-04 PASS
+sep_sat  ape (asis)     -p0hat                      -0.05998916    -0.06000000   1.08e-05  1.0e-04 PASS
+sep_sat  se (asis)      engine mata (R glm)          0.01938881     0.01939072   1.91e-06  1.0e-02 PASS
+sep_sat  se (asis)      other-cell binomial          0.01938881     0.01939072   1.91e-06  1.0e-02 PASS
+sep_sat  fit ok (no asis) fails                        0.00000000     0.00000000   0.00e+00  0.0e+00 PASS
+sep_cov  fit ok (asis)  engine mata ok               1.00000000     1.00000000   0.00e+00  0.0e+00 PASS
+sep_cov  ape (asis)     engine mata (R glm)         -0.06311275    -0.06311779   5.04e-06  1.0e-04 PASS
+sep_cov  se (asis)      engine mata (R glm)          0.02044593     0.02043384   1.21e-05  1.0e-02 PASS
+sep_sat  ape logit (asis) engine mata (R glm)         -0.05999999    -0.06000000   1.02e-08  1.0e-06 PASS
+sep_sat  se logit (asis) engine mata (R glm)          0.01939072     0.01939072   4.43e-09  1.0e-02 PASS
+util     req_delta_1    R req_delta                  2.92640519     2.92640519   2.22e-15  1.0e-09 PASS
+util     req_delta_2    R req_delta                  2.92640519     2.92640519   2.66e-15  1.0e-09 PASS
+util     req_margin     R req_margin                 0.06168438     0.06168438   3.47e-17  1.0e-09 PASS
+util     frontier       R alpha_frontier             0.02737173     0.02737173   3.47e-17  1.0e-09 PASS
+util     frontier_min   R alpha_frontier             0.20000000     0.20000000   1.39e-16  1.0e-09 PASS
+util     mz_r2          R mz_r2_logit                0.03267033     0.03267033   1.39e-17  1.0e-12 PASS
+Tier B: 171 comparisons, 171 PASS, 0 FAIL

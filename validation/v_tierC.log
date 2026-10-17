@@ -1,0 +1,273 @@
+
+. di as txt "powerape `pav'; Stata `c(stata_version)' (`c(born_date)')"
+powerape 0.1.3 (Stata port of powerape 1.11.3); Stata 19.5 (14 Oct 2026)
+
+. import delimited data/reference.csv, clear varnames(1) stringcols(1 2) asdoub
+> le
+(encoding automatically selected: ISO-8859-1)
+(3 vars, 151 obs)
+
+. mata:
+------------------------------------------------- mata (type end to exit) -----
+: REFC = st_sdata(., "case"); REFI = st_sdata(., "item"); REFV = st_data(., "va
+> lue")
+
+: real scalar refv(string scalar c, string scalar it)
+> {
+>     external string colvector REFC, REFI
+>     external real colvector REFV
+>     real scalar j
+>     for (j = 1; j <= rows(REFC); j++) if (REFC[j] == c & REFI[j] == it) retur
+> n(REFV[j])
+>     return(.)
+> }
+
+: RES = J(0, 1, ""); NP = 0; NF = 0
+
+: void recc(string scalar cs, string scalar item, real scalar stata, real scala
+> r r, real scalar reltol, string scalar note)
+> {
+>     external string colvector RES
+>     external real scalar NP, NF
+>     real scalar d, rel, ok
+>     d = abs(stata - r)
+>     rel = d / max((abs(r), 1e-8))
+>     ok = (rel <= reltol)
+>     RES = RES \ sprintf("%-6s %-11s Stata %13.7f  R %13.7f  rel.diff %9.2e  t
+> ol %7.1e  %s  %s", cs, item, stata, r, rel, reltol, (ok ? "PASS" : "FAIL"), n
+> ote)
+>     if (ok) NP++
+>     else NF++
+> }
+
+: end
+-------------------------------------------------------------------------------
+
+. * cal0: closed form (no covariates)
+. powerape dgp c0, focal(t, binary p(0.5)) baseline(0.30) nodisplay
+
+. powerape setape c0, target(0.10) nodisplay
+
+. mata: recc("cal0", "beta0", st_numscalar("r(beta0)"), refv("cal0", "beta0"), 
+> 1e-9, "closed form")
+
+. mata: recc("cal0", "beta_focal", st_numscalar("r(beta_focal)"), refv("cal0", 
+> "beta_focal"), 1e-8, "closed form")
+
+. mata: recc("cal0", "p1", st_numscalar("r(p1)"), refv("cal0", "p1"), 1e-8, "cl
+> osed form")
+
+. * cal1: one normal covariate, signal .15 (integration draw, n_int 4e5)
+. powerape dgp c1, focal(treat, binary p(0.5)) covariates((age, normal mean(45)
+>  sd(12))) baseline(0.30) signal(0.15) nodisplay
+
+. powerape setape c1, target(0.05) nodisplay
+
+. mata: recc("cal1", "beta0", st_numscalar("r(beta0)"), refv("cal1", "beta0"), 
+> 1e-2, "n_int 4e5, own draws")
+
+. mata: recc("cal1", "gamma1", st_matrix("r(gamma)")[1], refv("cal1", "gamma1")
+> , 1e-2, "n_int 4e5, own draws")
+
+. mata: recc("cal1", "beta_focal", st_numscalar("r(beta_focal)"), refv("cal1", 
+> "beta_focal"), 1e-2, "n_int 4e5, own draws")
+
+. mata: recc("cal1", "p1", st_numscalar("r(p1)"), refv("cal1", "p1"), 1e-3, "im
+> plied cell rate")
+
+. powerape dgp c1h, focal(treat, binary p(0.5)) covariates((age, normal mean(45
+> ) sd(12))) baseline(0.30) signal(0.15) nint(4000000) nodisplay
+
+. powerape setape c1h, target(0.05) nodisplay
+
+. mata: recc("cal1h", "beta0", st_numscalar("r(beta0)"), refv("cal1h", "beta0")
+> , 3e-3, "n_int 4e6")
+
+. mata: recc("cal1h", "gamma1", st_matrix("r(gamma)")[1], refv("cal1h", "gamma1
+> "), 3e-3, "n_int 4e6")
+
+. mata: recc("cal1h", "beta_focal", st_numscalar("r(beta_focal)"), refv("cal1h"
+> , "beta_focal"), 3e-3, "n_int 4e6")
+
+. * cal2: AIE, no covariates (exact)
+. powerape dgp c2, focal(treat, binary p(0.5)) moderator(female, binary p(0.55)
+> ) baseline(0.30) nodisplay
+
+. powerape setaie c2, target(0.04) mainfocal(0.10) mainmoderator(0.05) nodispla
+> y
+
+. mata: recc("cal2", "beta_focal", st_numscalar("r(beta_focal)"), refv("cal2", 
+> "beta_focal"), 1e-7, "closed form")
+
+. mata: recc("cal2", "beta_mod", st_numscalar("r(beta_mod)"), refv("cal2", "bet
+> a_mod"), 1e-7, "closed form")
+
+. mata: recc("cal2", "beta_int", st_numscalar("r(beta_int)"), refv("cal2", "bet
+> a_int"), 1e-6, "closed form (grid+Brent)")
+
+. * cal3: logit, continuous focal, two correlated covariates
+. powerape dgp c3, model(logit) focal(dose, normal mean(2) sd(1)) covariates((z
+> 1, normal) (z2, binary p(0.4))) ///
+>     correlation(0.2) baseline(0.25) signal(0.10) nodisplay
+
+. powerape setape c3, target(0.03) nodisplay
+
+. mata: recc("cal3", "beta0", st_numscalar("r(beta0)"), refv("cal3", "beta0"), 
+> 1e-2, "n_int 4e5, own draws")
+
+. mata: recc("cal3", "gamma1", st_matrix("r(gamma)")[1], refv("cal3", "gamma1")
+> , 1e-2, "n_int 4e5, own draws")
+
+. mata: recc("cal3", "gamma2", st_matrix("r(gamma)")[2], refv("cal3", "gamma2")
+> , 1e-2, "n_int 4e5, own draws")
+
+. mata: recc("cal3", "beta_focal", st_numscalar("r(beta_focal)"), refv("cal3", 
+> "beta_focal"), 1e-2, "n_int 4e5, own draws")
+
+. powerape dgp c3h, model(logit) focal(dose, normal mean(2) sd(1)) covariates((
+> z1, normal) (z2, binary p(0.4))) ///
+>     correlation(0.2) baseline(0.25) signal(0.10) nint(4000000) nodisplay
+
+. powerape setape c3h, target(0.03) nodisplay
+
+. mata: recc("cal3h", "beta0", st_numscalar("r(beta0)"), refv("cal3h", "beta0")
+> , 3e-3, "n_int 4e6")
+
+. mata: recc("cal3h", "beta_focal", st_numscalar("r(beta_focal)"), refv("cal3h"
+> , "beta_focal"), 3e-3, "n_int 4e6")
+
+. * calp: panel (n_int 1e5 units)
+. powerape dgp cp, panel focal(treat, binary p(0.5) icc(1)) covariates((size, n
+> ormal icc(0.6))) ///
+>     nperiods(4) rho(0.3) creshare(0.5) baseline(0.30) signal(0.10) nodisplay
+
+. powerape setape cp, target(0.08) nodisplay
+
+. mata: recc("calp", "beta0", st_numscalar("r(beta0)"), refv("calp", "beta0"), 
+> 2e-2, "n_int 1e5 units")
+
+. mata: recc("calp", "gamma1", st_matrix("r(gamma)")[1], refv("calp", "gamma1")
+> , 2e-2, "n_int 1e5 units")
+
+. mata: recc("calp", "beta_focal", st_numscalar("r(beta_focal)"), refv("calp", 
+> "beta_focal"), 2e-2, "n_int 1e5 units")
+
+. mata: d = pape_get_dgp("cp"); recc("calp", "xi1", d.xi[1], refv("calp", "xi1"
+> ), 2e-2, "Mundlak loading"); recc("calp", "var_a", d.var_a, refv("calp", "var
+> _a"), 1e-9, "closed form")
+
+. powerape trueape cp
+true APE of DGP cp on the integration set:          .08
+
+. mata: recc("calp", "true_ape", st_numscalar("r(ape)"), refv("calp", "true_ape
+> "), 1e-6, "pinned target")
+
+. * cali: IV (n_int 1e5)
+. powerape dgp ci, iv focal(training, binary p(0.4)) covariates((size, normal))
+>  instruments((subsidy, binary p(0.5))) ///
+>     endogeneity(0.4) ivstrength(0.2) baseline(0.30) signal(0.10) nodisplay
+
+. powerape setape ci, target(0.10) nodisplay
+
+. mata: d = pape_get_dgp("ci")
+
+. mata: recc("cali", "beta0", d.beta0, refv("cali", "beta0"), 2e-2, "n_int 1e5"
+> )
+
+. mata: recc("cali", "gamma1", d.gamma[1], refv("cali", "gamma1"), 2e-2, "n_int
+>  1e5")
+
+. mata: recc("cali", "pi_z1", d.pi_z[1], refv("cali", "pi_z1"), 2e-2, "n_int 1e
+> 5")
+
+. mata: recc("cali", "kappa0", d.kappa0, refv("cali", "kappa0"), 2e-2, "n_int 1
+> e5")
+
+. mata: recc("cali", "beta_focal", d.beta_focal, refv("cali", "beta_focal"), 2e
+> -2, "n_int 1e5")
+
+. mata:
+------------------------------------------------- mata (type end to exit) -----
+: printf("\n")
+
+
+: for (j = 1; j <= rows(RES); j++) printf("{txt}%s\n", RES[j])
+cal0   beta0       Stata    -0.5244005  R    -0.5244005  rel.diff  6.35e-16  to
+> l  1.0e-09  PASS  closed form
+cal0   beta_focal  Stata     0.2710534  R     0.2710534  rel.diff  1.02e-15  to
+> l  1.0e-08  PASS  closed form
+cal0   p1          Stata     0.4000000  R     0.4000000  rel.diff  6.94e-16  to
+> l  1.0e-08  PASS  closed form
+cal1   beta0       Stata    -2.1436358  R    -2.1400025  rel.diff  1.70e-03  to
+> l  1.0e-02  PASS  n_int 4e5, own draws
+cal1   gamma1      Stata     0.0350181  R     0.0349397  rel.diff  2.24e-03  to
+> l  1.0e-02  PASS  n_int 4e5, own draws
+cal1   beta_focal  Stata     0.1508388  R     0.1508496  rel.diff  7.18e-05  to
+> l  1.0e-02  PASS  n_int 4e5, own draws
+cal1   p1          Stata     0.3500000  R     0.3500000  rel.diff  1.59e-13  to
+> l  1.0e-03  PASS  implied cell rate
+cal1h  beta0       Stata    -2.1440094  R    -2.1436235  rel.diff  1.80e-04  to
+> l  3.0e-03  PASS  n_int 4e6
+cal1h  gamma1      Stata     0.0350134  R     0.0350045  rel.diff  2.55e-04  to
+> l  3.0e-03  PASS  n_int 4e6
+cal1h  beta_focal  Stata     0.1508528  R     0.1508535  rel.diff  4.50e-06  to
+> l  3.0e-03  PASS  n_int 4e6
+cal2   beta_focal  Stata     0.2710534  R     0.2710534  rel.diff  2.05e-16  to
+> l  1.0e-07  PASS  closed form
+cal2   beta_mod    Stata     0.1390800  R     0.1390800  rel.diff  3.99e-16  to
+> l  1.0e-07  PASS  closed form
+cal2   beta_int    Stata     0.0891981  R     0.0891981  rel.diff  4.67e-16  to
+> l  1.0e-06  PASS  closed form (grid+Brent)
+cal3   beta0       Stata    -1.3037540  R    -1.3039823  rel.diff  1.75e-04  to
+> l  1.0e-02  PASS  n_int 4e5, own draws
+cal3   gamma1      Stata     0.2194280  R     0.2187895  rel.diff  2.92e-03  to
+> l  1.0e-02  PASS  n_int 4e5, own draws
+cal3   gamma2      Stata     0.4479056  R     0.4466022  rel.diff  2.92e-03  to
+> l  1.0e-02  PASS  n_int 4e5, own draws
+cal3   beta_focal  Stata     0.1640111  R     0.1639709  rel.diff  2.45e-04  to
+> l  1.0e-02  PASS  n_int 4e5, own draws
+cal3h  beta0       Stata    -1.3045956  R    -1.3045497  rel.diff  3.51e-05  to
+> l  3.0e-03  PASS  n_int 4e6
+cal3h  beta_focal  Stata     0.1640063  R     0.1639998  rel.diff  3.97e-05  to
+> l  3.0e-03  PASS  n_int 4e6
+calp   beta0       Stata    -0.7029907  R    -0.7025040  rel.diff  6.93e-04  to
+> l  2.0e-02  PASS  n_int 1e5 units
+calp   gamma1      Stata     0.3337507  R     0.3337377  rel.diff  3.91e-05  to
+> l  2.0e-02  PASS  n_int 1e5 units
+calp   beta_focal  Stata     0.2935392  R     0.2935302  rel.diff  3.10e-05  to
+> l  2.0e-02  PASS  n_int 1e5 units
+calp   xi1         Stata     0.5543272  R     0.5538679  rel.diff  8.29e-04  to
+> l  2.0e-02  PASS  Mundlak loading
+calp   var_a       Stata     0.2142857  R     0.2142857  rel.diff  1.42e-15  to
+> l  1.0e-09  PASS  closed form
+calp   true_ape    Stata     0.0800000  R     0.0800000  rel.diff  1.73e-14  to
+> l  1.0e-06  PASS  pinned target
+cali   beta0       Stata    -0.5527150  R    -0.5531964  rel.diff  8.70e-04  to
+> l  2.0e-02  PASS  n_int 1e5
+cali   gamma1      Stata     0.3330453  R     0.3327323  rel.diff  9.40e-04  to
+> l  2.0e-02  PASS  n_int 1e5
+cali   pi_z1       Stata     0.9999958  R     0.9999993  rel.diff  3.49e-06  to
+> l  2.0e-02  PASS  n_int 1e5
+cali   kappa0      Stata    -0.7876342  R    -0.7853892  rel.diff  2.86e-03  to
+> l  2.0e-02  PASS  n_int 1e5
+cali   beta_focal  Stata     0.2857220  R     0.2857351  rel.diff  4.61e-05  to
+> l  2.0e-02  PASS  n_int 1e5
+
+: printf("\n{txt}Tier C: %f PASS, %f FAIL\n", NP, NF)
+
+Tier C: 30 PASS, 0 FAIL
+
+: unlink("tierC-results.txt")
+
+: fh = fopen("tierC-results.txt", "w")
+
+: for (j = 1; j <= rows(RES); j++) fput(fh, RES[j])
+
+: fput(fh, sprintf("Tier C: %f PASS, %f FAIL", NP, NF))
+
+: fclose(fh)
+
+: end
+-------------------------------------------------------------------------------
+
+. log close tier

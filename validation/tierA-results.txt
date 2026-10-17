@@ -1,0 +1,13 @@
+V1 detect, n = 712, engine(mata), nsim 40000         exact  0.8018  simulated  0.8059  MCSE 0.0020  |diff| 0.0041  PASS
+V1 minimum (sesoi .04), engine(mata), nsim 40000     exact  0.5175  simulated  0.5163  MCSE 0.0025  |diff| 0.0012  PASS
+V1 equivalence (sesoi .05, truth 0), engine(mata)    exact  0.0000  simulated  0.0000  MCSE 0.0000  |diff| 0.0000  PASS
+equivalence (sesoi .07, truth 0), engine(mata)       exact  0.3060  simulated  0.3068  MCSE 0.0023  |diff| 0.0008  PASS
+V1 detect, n = 712, engine(stata), nsim 4000         exact  0.8018  simulated  0.8030  MCSE 0.0063  |diff| 0.0012  PASS
+V1 minimum (sesoi .04), engine(stata), nsim 4000     exact  0.5175  simulated  0.5102  MCSE 0.0079  |diff| 0.0073  PASS
+V1 detect, engine(stata) effects(margins), nsim 1000 exact  0.8018  simulated  0.8040  MCSE 0.0126  |diff| 0.0022  PASS
+rare .05->.01, n = 300, separation(fail), engine(mata) exact  0.3503  simulated  0.3496  MCSE 0.0034  |diff| 0.0007  PASS
+rare .05->.01, n = 300, separation(keep), engine(mata) exact  0.5602  simulated  0.5619  MCSE 0.0035  |diff| 0.0017  PASS
+rare .05->.01, n = 300, separation(fail), engine(stata) exact  0.3503  simulated  0.3490  MCSE 0.0075  |diff| 0.0013  PASS
+rare .05->.01, n = 300, separation(keep), engine(stata) exact  0.5602  simulated  0.5705  MCSE 0.0078  |diff| 0.0103  PASS
+probit = logit, saturated case, same seed            exact  0.6640  simulated  0.6640  MCSE 0.0000  |diff| 0.0000  PASS
+Tier A: 12 PASS, 0 FAIL

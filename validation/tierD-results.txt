@@ -1,0 +1,46 @@
+D1 minimum power, n 2000, engine(mata)                     Stata   0.4392 (MCSE 0.0078)  R   0.4415 (MCSE 0.0079)  |diff| 0.0023  tol 0.0333  PASS
+D1 detect-only share                                       Stata   0.2695 (MCSE 0.0070)  R   0.2622 (MCSE 0.0070)  |diff| 0.0073  tol 0.0296  PASS
+D1 inconclusive share                                      Stata   0.2913 (MCSE 0.0072)  R   0.2963 (MCSE 0.0072)  |diff| 0.0050  tol 0.0306  PASS
+D1 minimum power, engine(stata) probit, nsim 1000          Stata   0.4490 (MCSE 0.0157)  R   0.4415 (MCSE 0.0079)  |diff| 0.0075  tol 0.0527  PASS
+D1 detect power, engine(mata)                              Stata   0.7167 (MCSE 0.0071)  R   0.7015 (MCSE 0.0072)  |diff| 0.0152  tol 0.0305  PASS
+D2 logit continuous, robust SE, engine(mata)               Stata   0.4978 (MCSE 0.0079)  R   0.4920 (MCSE 0.0079)  |diff| 0.0058  tol 0.0335  PASS
+D2 logit continuous, model SE, engine(mata)                Stata   0.4988 (MCSE 0.0079)  R   0.4870 (MCSE 0.0079)  |diff| 0.0118  tol 0.0335  PASS
+D2 logit continuous, vce(robust), engine(stata)            Stata   0.4880 (MCSE 0.0158)  R   0.4920 (MCSE 0.0079)  |diff| 0.0040  tol 0.0530  PASS
+D3 AIE binary x binary, n 4000, engine(mata)               Stata   0.2587 (MCSE 0.0069)  R   0.2537 (MCSE 0.0069)  |diff| 0.0050  tol 0.0293  PASS
+D3 AIE binary x binary, engine(stata)                      Stata   0.2450 (MCSE 0.0136)  R   0.2537 (MCSE 0.0069)  |diff| 0.0087  tol 0.0457  PASS
+D3 AIE, engine(stata) effects(margins)=ginteff, nsim 300   Stata   0.2433 (MCSE 0.0248)  R   0.2537 (MCSE 0.0069)  |diff| 0.0104  tol 0.0771  PASS
+D3b AIE continuous x binary (logit), engine(mata)          Stata   0.4190 (MCSE 0.0078)  R   0.4395 (MCSE 0.0078)  |diff| 0.0205  tol 0.0332  PASS
+D4 equivalence power at truth 0, engine(mata)              Stata   0.5803 (MCSE 0.0078)  R   0.5753 (MCSE 0.0078)  |diff| 0.0050  tol 0.0331  PASS
+D5 panel CRE probit, 150 units x 4, engine(mata)           Stata   0.5423 (MCSE 0.0079)  R   0.5430 (MCSE 0.0079)  |diff| 0.0008  tol 0.0334  PASS
+D5 panel, engine(stata) probit vce(cluster)                Stata   0.5370 (MCSE 0.0158)  R   0.5430 (MCSE 0.0079)  |diff| 0.0060  tol 0.0529  PASS
+D5u unbalanced panel (retention .8), engine(mata)          Stata   0.4828 (MCSE 0.0079)  R   0.4883 (MCSE 0.0079)  |diff| 0.0055  tol 0.0335  PASS
+D6 IV binary focal (probit first stage), engine(mata)      Stata   0.2670 (MCSE 0.0070)  R   0.2622 (MCSE 0.0070)  |diff| 0.0048  tol 0.0296  PASS
+D6 IV binary focal, engine(stata) cfprobit, nsim 400       Stata   0.2750 (MCSE 0.0223)  R   0.2622 (MCSE 0.0070)  |diff| 0.0128  tol 0.0702  PASS
+D6c IV continuous focal (linear first stage), engine(mata) Stata   0.7915 (MCSE 0.0064)  R   0.7857 (MCSE 0.0065)  |diff| 0.0058  tol 0.0274  PASS
+D6c IV continuous, engine(stata) cfprobit, nsim 400        Stata   0.7850 (MCSE 0.0205)  R   0.7857 (MCSE 0.0065)  |diff| 0.0007  tol 0.0646  PASS
+D6c IV continuous, cfprobit + margins, nsim 200            Stata   0.7800 (MCSE 0.0293)  R   0.7857 (MCSE 0.0065)  |diff| 0.0057  tol 0.0900  PASS
+D7 empirical beta0 (exact: same rows)                      Stata  -1.9907  R  -1.9907  rel.diff  3.3e-16  tol  1.0e-07  PASS
+D7 empirical gamma1                                        Stata   0.0239  R   0.0239  rel.diff  3.0e-15  tol  1.0e-07  PASS
+D7 empirical gamma2                                        Stata   0.5887  R   0.5887  rel.diff  2.1e-15  tol  1.0e-07  PASS
+D7 empirical beta_focal                                    Stata   0.1507  R   0.1507  rel.diff  5.5e-16  tol  1.0e-07  PASS
+D7 empirical route minimum power, engine(mata)             Stata   0.3588 (MCSE 0.0076)  R   0.3623 (MCSE 0.0076)  |diff| 0.0035  tol 0.0322  PASS
+D8 required n, detect 80%, Design A world (R 2494)         Stata  2.5e+03  R  2.5e+03  rel.diff  4.0e-04  tol  6.0e-02  PASS
+D8 confirmation rule satisfied (1 = yes)                   Stata   1.0000  R   1.0000  rel.diff  0.0e+00  tol  0.0e+00  PASS
+D8 required n, minimum 80% (R 5451)                        Stata  5.5e+03  R  5.5e+03  rel.diff  1.8e-03  tol  6.0e-02  PASS
+D8 required n, saturated .30->.40 (R 707; analytic 712)    Stata 726.0000  R 707.0000  rel.diff  2.7e-02  tol  6.0e-02  PASS
+D8 required n, saturated, engine(stata) nsim 600 (search noise) Stata 783.0000  R 707.0000  rel.diff  1.1e-01  tol  1.5e-01  PASS
+D8 engine(stata) confirmation rule satisfied (1 = yes)     Stata   1.0000  R   1.0000  rel.diff  0.0e+00  tol  0.0e+00  PASS
+D9 MDE at n 712 (R .0996)                                  Stata   0.0996  R   0.0996  rel.diff  1.3e-05  tol  6.0e-02  PASS
+D9 equivalence margin at n 2000 (R .0600)                  Stata   0.0599  R   0.0600  rel.diff  1.1e-03  tol  6.0e-02  PASS
+D10 power under the alpha rule                             Stata   0.7825 (MCSE 0.0065)  R   0.7802 (MCSE 0.0065)  |diff| 0.0022  tol 0.0277  PASS
+D10 alpha from the rule at n 712                           Stata   0.0419  R   0.0419  rel.diff  8.3e-16  tol  1.0e-09  PASS
+D10 robust scenario 1 power (baseline sweep)               Stata   0.3865 (MCSE 0.0109)  R   0.3925 (MCSE 0.0109)  |diff| 0.0060  tol 0.0463  PASS
+D10 robust scenario 2 power (baseline sweep)               Stata   0.3290 (MCSE 0.0105)  R   0.3205 (MCSE 0.0104)  |diff| 0.0085  tol 0.0444  PASS
+D10 robust scenario 3 power (baseline sweep)               Stata   0.2715 (MCSE 0.0099)  R   0.2865 (MCSE 0.0101)  |diff| 0.0150  tol 0.0425  PASS
+D11 power at alpha .01                                     Stata   0.1985 (MCSE 0.0063)  R   0.1978 (MCSE 0.0063)  |diff| 0.0008  tol 0.0267  PASS
+D11 power at alpha .025                                    Stata   0.3235 (MCSE 0.0074)  R   0.3232 (MCSE 0.0074)  |diff| 0.0003  tol 0.0314  PASS
+D11 power at alpha .05                                     Stata   0.4455 (MCSE 0.0079)  R   0.4427 (MCSE 0.0079)  |diff| 0.0028  tol 0.0333  PASS
+D11 power at alpha .10                                     Stata   0.5843 (MCSE 0.0078)  R   0.5817 (MCSE 0.0078)  |diff| 0.0025  tol 0.0331  PASS
+D11 alpha* (flat objective; R .0485)                       Stata   0.0490  R   0.0485  rel.diff  1.0e-02  tol  5.0e-01  PASS
+D11 weighted combined error at alpha*                      Stata   0.1509  R   0.1510  rel.diff  6.6e-04  tol  5.0e-02  PASS
+Tier D: 45 PASS, 0 FAIL

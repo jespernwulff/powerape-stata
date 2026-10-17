@@ -1,0 +1,19 @@
+* stata.toc -- content file for the powerape Stata port
+* Point -net from- at the repository (or at a local copy of it):
+*   . net from "https://raw.githubusercontent.com/jespernwulff/powerape-stata/main/"
+*   . net describe powerape
+*   . net install powerape
+*   . net get powerape                        (ancillary files: showcase.do and build.do)
+*   . mata: mata mlib index                   (index the newly installed Mata library)
+v 3
+d powerape for Stata: power analysis for average partial effects (APE) and average interaction effects (AIE)
+d Stata port of the R package powerape (https://github.com/jespernwulff/powerape)
+d Jesper N. Wulff, Aarhus University
+d
+d Simulation-based power for the APE/AIE of probit and logit models: minimum-effect,
+d detection and equivalence claims; power curves; required n; minimum detectable effects;
+d robustness sweeps; justified alpha; citable power statements. Every simulated study is
+d fit, by default, by Stata's own probit/logit/cfprobit (engine(stata)); engine(mata) is a
+d fast self-contained Mata engine. Stata 16 or later (see the package description).
+d
+p powerape Power analysis for APEs and AIEs of probit/logit models (ado, help file, Mata library)

@@ -1,0 +1,31 @@
+cal0   beta0       Stata    -0.5244005  R    -0.5244005  rel.diff  6.35e-16  tol  1.0e-09  PASS  closed form
+cal0   beta_focal  Stata     0.2710534  R     0.2710534  rel.diff  1.02e-15  tol  1.0e-08  PASS  closed form
+cal0   p1          Stata     0.4000000  R     0.4000000  rel.diff  6.94e-16  tol  1.0e-08  PASS  closed form
+cal1   beta0       Stata    -2.1436358  R    -2.1400025  rel.diff  1.70e-03  tol  1.0e-02  PASS  n_int 4e5, own draws
+cal1   gamma1      Stata     0.0350181  R     0.0349397  rel.diff  2.24e-03  tol  1.0e-02  PASS  n_int 4e5, own draws
+cal1   beta_focal  Stata     0.1508388  R     0.1508496  rel.diff  7.18e-05  tol  1.0e-02  PASS  n_int 4e5, own draws
+cal1   p1          Stata     0.3500000  R     0.3500000  rel.diff  1.59e-13  tol  1.0e-03  PASS  implied cell rate
+cal1h  beta0       Stata    -2.1440094  R    -2.1436235  rel.diff  1.80e-04  tol  3.0e-03  PASS  n_int 4e6
+cal1h  gamma1      Stata     0.0350134  R     0.0350045  rel.diff  2.55e-04  tol  3.0e-03  PASS  n_int 4e6
+cal1h  beta_focal  Stata     0.1508528  R     0.1508535  rel.diff  4.50e-06  tol  3.0e-03  PASS  n_int 4e6
+cal2   beta_focal  Stata     0.2710534  R     0.2710534  rel.diff  2.05e-16  tol  1.0e-07  PASS  closed form
+cal2   beta_mod    Stata     0.1390800  R     0.1390800  rel.diff  3.99e-16  tol  1.0e-07  PASS  closed form
+cal2   beta_int    Stata     0.0891981  R     0.0891981  rel.diff  4.67e-16  tol  1.0e-06  PASS  closed form (grid+Brent)
+cal3   beta0       Stata    -1.3037540  R    -1.3039823  rel.diff  1.75e-04  tol  1.0e-02  PASS  n_int 4e5, own draws
+cal3   gamma1      Stata     0.2194280  R     0.2187895  rel.diff  2.92e-03  tol  1.0e-02  PASS  n_int 4e5, own draws
+cal3   gamma2      Stata     0.4479056  R     0.4466022  rel.diff  2.92e-03  tol  1.0e-02  PASS  n_int 4e5, own draws
+cal3   beta_focal  Stata     0.1640111  R     0.1639709  rel.diff  2.45e-04  tol  1.0e-02  PASS  n_int 4e5, own draws
+cal3h  beta0       Stata    -1.3045956  R    -1.3045497  rel.diff  3.51e-05  tol  3.0e-03  PASS  n_int 4e6
+cal3h  beta_focal  Stata     0.1640063  R     0.1639998  rel.diff  3.97e-05  tol  3.0e-03  PASS  n_int 4e6
+calp   beta0       Stata    -0.7029907  R    -0.7025040  rel.diff  6.93e-04  tol  2.0e-02  PASS  n_int 1e5 units
+calp   gamma1      Stata     0.3337507  R     0.3337377  rel.diff  3.91e-05  tol  2.0e-02  PASS  n_int 1e5 units
+calp   beta_focal  Stata     0.2935392  R     0.2935302  rel.diff  3.10e-05  tol  2.0e-02  PASS  n_int 1e5 units
+calp   xi1         Stata     0.5543272  R     0.5538679  rel.diff  8.29e-04  tol  2.0e-02  PASS  Mundlak loading
+calp   var_a       Stata     0.2142857  R     0.2142857  rel.diff  1.42e-15  tol  1.0e-09  PASS  closed form
+calp   true_ape    Stata     0.0800000  R     0.0800000  rel.diff  1.73e-14  tol  1.0e-06  PASS  pinned target
+cali   beta0       Stata    -0.5527150  R    -0.5531964  rel.diff  8.70e-04  tol  2.0e-02  PASS  n_int 1e5
+cali   gamma1      Stata     0.3330453  R     0.3327323  rel.diff  9.40e-04  tol  2.0e-02  PASS  n_int 1e5
+cali   pi_z1       Stata     0.9999958  R     0.9999993  rel.diff  3.49e-06  tol  2.0e-02  PASS  n_int 1e5
+cali   kappa0      Stata    -0.7876342  R    -0.7853892  rel.diff  2.86e-03  tol  2.0e-02  PASS  n_int 1e5
+cali   beta_focal  Stata     0.2857220  R     0.2857351  rel.diff  4.61e-05  tol  2.0e-02  PASS  n_int 1e5
+Tier C: 30 PASS, 0 FAIL
