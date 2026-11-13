@@ -13,6 +13,12 @@ Reference values come from `export_fixtures.R` (fixed datasets and R internals) 
 `tierD_r.R` (matched simulations), also run from the repository root. Raw result lines:
 `tier?-results.txt`; logs `v_tier?.log`.
 
+The difference-in-differences route, ported on 2026-11-13 and not released (the version
+strings are still 0.1.3), is validated in the last section, with scripts and result files
+of its own (`v_did_tier?.do`, `did-tier?-results.txt`): A 31/31, B 225/225, C 235/235,
+D 53/53 PASS against the development version of the R package. The four tiers below
+were rerun on that library and their result files and logs are byte-identical.
+
 **Updated 2026-10-16 (version 0.1.1):** all four tiers were regenerated after the
 engine changes of 0.1.1 (the Stata engine's `separation(keep)`, `effects(margins)`
 for the IV AIE, `version 16`). Tiers A and B gained rows; their pre-existing rows are
@@ -603,3 +609,210 @@ on, each log equals the earlier batch log line for line; only the last line diff
   file's path and the library's location), the smoke tests, the probes
   `tests/*_2026-10-1?.do` with their logs, and the `legacy/` folders that earlier
   sections cite.
+
+## 2026-11-13 difference-in-differences route (development version after 0.1.3)
+
+The R package gained a difference-in-differences route on 2026-11-11 (designs with a
+treated and a control group before and after one treatment date; the target is the
+effect on the treated in probability points). This section records its port: `powerape
+dgp NAME, did`, `powerape setatt`, `powerape trueatt`, `powerape dgp NAME, didpilot`,
+and the route in `power`, `curve`, `n`, `mde`, `robust` (also over the scale on which
+trends are parallel), `powerat`, `alpha` and `statement`, under both engines and both
+analyses (pooled probit/logit with the effect as an average partial effect over the
+treated post-period rows; linear probability model with HC1 or unit-clustered standard
+errors), with one or several periods a side and with a binary subgroup.
+
+**Status of what was validated.** Nothing is released or committed: the version strings
+are still 0.1.3 (the first line of each log says so), and the library that ran these
+tiers is the working tree of 2026-11-13 (`powerape.ado` md5
+2fc175ffc3b45798f89597ebf440b57a, `lpowerape.mlib` md5
+a554d612e0eecb2aa2ed71b57b6e5091; StataNow/SE 19.5, update 14 Oct 2026). **The R
+references come from the unreleased development version of the R package** (the source
+tree after 1.11.4, loaded with `pkgload`; its DESCRIPTION still says 1.11.4, which is
+what `did_tierD_r.log` prints), because no released R version has the route. The two R
+scripts take that tree from the environment variable `POWERAPE_R_DEV`. That tree is not
+committed either, so its state is pinned here by the md5 (first eight digits) of the R
+sources the references ran on, between 16:52 and 17:20 on 2026-11-13: `did.R` 465cc789,
+`did-subgroup.R` faf0310a, `did-pilot.R` be416be6, `did-statement.R` 5a23bc9b,
+`linear.R` 474ad9ec, `engine.R` 89d1a11d, `ape-math.R` bbe618f0, `robust.R` d659bf73,
+`alpha.R` db40c9ca, `mde.R` a6982226, `curve.R` 1b44ccf0.
+
+The route has its own scripts and result files, so the files of the four tiers above are
+untouched: `v_did_tierA.do` to `v_did_tierD.do`, `did-tier?-results.txt`,
+`v_did_tier?.log`; R side `did_export_fixtures.R` (fixed data, R's estimates on them,
+calibration constants, the enumeration's inputs and exact values) and `did_tierD_r.R`
+(matched simulations; log `did_tierD_r.log`); data `data/didfix_*.csv`,
+`data/did-reference.csv`, `data/did-tierA-sizes.csv`, `data/did-tierD-reference.csv`.
+
+### Tier A: exact power by enumeration (31/31 PASS)
+
+Repeated cross-sections without covariates are saturated in the four group-by-period
+cells: given the cell sizes, every study is one of prod(n_c + 1) outcomes with a known
+binomial probability, and the estimate and its standard error are closed forms in the
+four cell means (index analysis: p11 - G(G^-1(p10) + G^-1(p01) - G^-1(p00)) with its
+delta-method SE; linear analysis: the cross difference with the HC1 SE). The exact
+conditional power is averaged over 1,000 draws of the multinomial cell sizes. R wrote
+its draws to `data/did-tierA-sizes.csv`, and the oracle, ported to Mata in
+`v_did_tierA.do`, uses the same ones: it reproduces R's exact power and exact share of
+studies without a usable estimate to 2e-16 (three analyses). Design: n = 120, detection
+claim, control .30 and .40, treated .40 before and an effect of .30. Criterion for the
+engines: |simulated - exact| <= 4 x sqrt(MCSE^2 + SE of the exact value^2) + 1e-4.
+
+| analysis | exact power | engine(mata), 40,000 | engine(stata), 4,000 | exact failed | mata failed | stata failed |
+|---|---|---|---|---|---|---|
+| logit, index | 0.3848 | 0.3835 | 0.3965 | 0.0029 | 0.0029 | 0.0022 |
+| probit, index | 0.3948 | 0.3943 | 0.3957 | 0.0027 | 0.0026 | 0.0018 |
+| linear (OLS, HC1) | 0.4231 | 0.4246 | 0.4275 | 0.0000 | 0.0000 | 0.0000 |
+
+MCSE 0.0024 at 40,000 studies and 0.0077 at 4,000; the exact values carry a standard
+error of 0.0003 from the size draws. `engine(stata) effects(margins)` (logit, 1,500
+studies): 0.3713 (MCSE 0.0126). The exact values are the ones the R battery records
+(.3848 / .3948 / .4231; failed .0029).
+
+### Tier B: fixed-data parity (225/225 PASS)
+
+Five fixed datasets: the three difference-in-differences fixtures of the R package's
+regression tests against Stata (`did`: panel of 400 units, one period a side, a
+covariate; `didx`: repeated cross-sections, four periods; `sub`: panel with a binary
+subgroup), and two studies drawn from the route itself (`rp`: probit panel, two periods
+a side, a covariate correlated with the group; `rs`: logit cross-sections with a
+subgroup, one period before and two after, a covariate). Every dataset goes through
+every path of the port (`pape_did_analyze()` runs one given study as the simulation loop
+runs a simulated one).
+
+| comparison | rows | largest absolute difference |
+|---|---|---|
+| engine(mata) vs R: coefficients; Jacobian | 54; 54 | 8e-14; 2e-15 |
+| engine(mata) vs R: estimate (and the two subgroup effects) | 7 (6) | 2e-14 |
+| engine(mata) vs R: SE (cluster; model; HC0) | 3; 2; 2 | 5e-8; 1e-8; 2.5e-8 |
+| engine(mata) vs R: OLS coefficient; SE (HC1, cluster) | 7; 7 | 6e-15; 1e-15 |
+| engine(stata) closed form vs R: estimate | 7 | 2e-8 |
+| engine(stata) closed form vs R: SE, logit (cluster; model) | 2; 2 | 5e-8; 1e-8 |
+| engine(stata) vs R: SE, logit `vce(robust)` | 2 | 2.5e-5 (Stata's factor N/(N-1); 2.5e-8 after it) |
+| engine(stata) vs R: SE, probit `vce(cluster)` | 1 | 2.1e-5 (observed against expected information) |
+| `effects(margins)` vs the closed form on Stata's fit: estimate; SE | 7; 7 | 4e-16; 3e-16 |
+| engine(stata) `regress` vs R: coefficient; SE | 7; 7 | 2e-14; 2e-14 |
+
+(The 5e-8 in the Mata engine's SE with coefficients equal to 1e-13 is the fit's own
+tolerance: R's glm keeps the weights of its last iteration, the port recomputes them at
+the final coefficients.)
+
+Stata's own commands on the fixtures with named variables: `logit` + `margins, dydx(w)
+subpop(if w == 1)` equals R's estimate (2e-8) and SE (cluster 3e-8, model 1e-8; with
+`vce(robust)` 2.5e-8 after the factor N/(N-1)); `margins ... over(m)` + `lincom` equals
+the subgroup difference (4e-9) and its SE (5e-8); `regress, vce(robust)` and
+`vce(cluster)` equal the linear analysis (coefficient 5e-15, SE 1e-14); `didregress,
+vce(robust)` equals it in cross-sections (2e-15, 8e-16); `xtdidregress` gives the same
+estimate (4e-16) and an SE that differs by sqrt((N-3)/(N-5)), its count of regressors,
+and equals it after that factor (5e-16); the official triple difference `didregress (y)
+(mw), group(d m)` equals the subgroup linear estimate (1e-14; two periods).
+
+### Tier C: calibration constants (235/235 PASS)
+
+For each design: the index coefficients (a, b, l, th, de), the five block rates, the
+two readings of the rates, the realized signal, the true effect and the coefficient
+vector in design-matrix order. Five designs without covariates (logit and probit, index
+and linear worlds, several periods, two with a subgroup) are closed forms: all 126
+comparisons agree with R to 1e-16. Four designs calibrate on an integration draw, which
+each package draws for itself: at `nint(4e5)` the coefficients differ by at most 3.2e-3
+and the rates, readings and true effect by at most 3.4e-5; at `nint(4e6)` by 5.0e-4 and
+3.6e-6. The pilot builder: the copula's joint rate (`binormal()` in Mata, numerical
+integration in R) agrees to 7e-17 and the method-of-moments solver to 6e-17; on a pilot
+panel that both packages read (3,000 units, three pre-treatment periods) baseline, gap,
+treated share and the control group's change are identical and rho agrees to 3e-16.
+
+### Tier D: stochastic agreement on matched designs (53/53 PASS)
+
+R at 4,000 replications per power (`did_tierD_r.R`, 20 minutes); Stata at 4,000
+(`engine(mata)`) and at 200 to 1,000 for the Stata engine. Criterion: |difference| <= 3
+x sqrt(MCSE_R^2 + MCSE_Stata^2); searches within 6% of R's answer.
+
+| design | quantity | R | engine(mata) | engine(stata) |
+|---|---|---|---|---|
+| P1 logit panel, rho .4, ATT .07, 1,500 units | detect power | 0.5445 | 0.5517 | 0.5720 (1,000); margins 0.5567 (300) |
+| P1 | minimum claim (sesoi .02) | 0.4360 | 0.4250 | |
+| P1 | mean of the estimates | 0.0699 | 0.0694 | |
+| P2 probit cross-sections, covariate, n 2,500 | detect, model SE | 0.5475 | 0.5383 | 0.5500 |
+| P2 | detect, robust SE | 0.5435 | 0.5383 | 0.5490 |
+| P3 linear analysis, linear world, panel, 900 units | detect | 0.7837 | 0.7837 | 0.7830 (`regress, vce(cluster)`) |
+| P4 linear analysis, cross-sections, covariate, 30% treated | detect | 0.5220 | 0.5250 | 0.5470 (`regress, vce(robust)`) |
+| P5a logit analysis in a linear world (truth .100) | rejection rate; mean estimate | 0.3425; 0.0663 | 0.3630; 0.0678 | |
+| P5b linear analysis in an index world (truth .0667) | rejection rate; mean estimate | 0.7802; 0.0995 | 0.7917; 0.0989 | |
+| P6 two periods a side, logit panel | detect | 0.8143 | 0.8177 | 0.8100 |
+| P6x 2 + 3 periods, cross-sections, linear analysis | detect | 0.4860 | 0.4813 | |
+| P7 subgroup difference, logit, 4,000 units | detect; mean estimate | 0.4052; -0.0703 | 0.4138; -0.0714 | 0.4200 (600); margins `over()` 0.3950 (200) |
+| P7l subgroup difference, linear analysis | detect | 0.5090 | 0.5068 | 0.5350 |
+| P8 required units, 80% detection | P1 / P3 / P6 | 2,692 / 921 / 1,449 | 2,692 / 924 / 1,448 | |
+| P9 minimum detectable effect | P1 / P3 / P7 | 0.0930 / 0.1012 / -0.1131 | 0.0958 / 0.1011 / -0.1129 | |
+| P10 sweep over rho (.2, .4, .6) | power | 0.476 / 0.545 / 0.620 | 0.489 / 0.537 / 0.633 | |
+| P10 sweep over the trends scale | index: power; linear: rejection rate, mean estimate, flag | 0.5595; 0.348, 0.0519, not valid | 0.5570; 0.345, 0.0519, not valid | |
+| P11 power at alpha .01 / .025 / .05 / .10 | stored draws | 0.207 / 0.321 / 0.436 / 0.578 | 0.214 / 0.326 / 0.438 / 0.573 | |
+| P11 justified alpha (cost 4) | alpha*; weighted combined error | 0.0420; 0.1522 | 0.0355; 0.1516 | |
+
+MCSE 0.008 at 4,000 studies. In the result file, the two rows "sweep over trends, mean
+estimate" print 0.0015 where the other rows print a Monte Carlo error: that figure is a
+fixed allowance (the sweep's table does not carry the estimates' standard error), not a
+measured one; the differences there are 0.0005 and 0.0000. The mismatched cells (P5a, P5b) are flagged `r(valid) = 0`
+in both packages, and the estimates centre on the other reading of the rates, as in R.
+The alpha* of P11 sits on a flat objective (as for the standard routes): the weighted
+combined error agrees to 0.4%.
+
+### Regression tests, smoke tests, installation
+
+`tests/run-tests.do`: 196/196 PASS, the 94 checks that existed plus 102 for the route
+(closed-form calibration and both readings; the cases in which the readings coincide;
+refusals of the builder, the pins and the mismatched searches; the saturated identities
+of the estimate on a fixed study under both links, both analyses and all three ways of
+fitting; equality of `regress, vce(robust)`; the same power from the Mata engine,
+`logit, vce(cluster)`, `margins` and `regress` on one seed; `r(fit)` labels; the sweep,
+including the trends scale, MDE mode and subgroup designs; `powerat`, `alpha` with the
+boundary world; the wording of the paragraph for both analyses; the pilot builder on a
+20,000-unit pilot; and that a standard design returns none of the new results).
+`tests/did_smoke_2026-11-13.do` and `tests/did_smoke2_2026-11-13.do` run every variant
+under both engines without an error. `tests/net_install_did_2026-11-13.do` (scratch
+PLUS and PERSONAL): `net install` with the two new Mata sources, `powerape version`
+match, a logit and a linear run from the installed copy, `net get`, `build.do` in a copy,
+`ado uninstall`: 5/5 PASS.
+
+### The routes that existed before: unchanged
+
+The port adds two Mata sources (`powerape_did.mata`, `powerape_did_cmd.mata`), appends
+fields to the shared structures and places one-line dispatches in the existing sources.
+Evidence that nothing else moved:
+
+* `tests/did_port_identity_2026-11-13.do` writes 290 seeded values of the old routes
+  in `%21x` (parametric probit and logit under both engines and `margins`, robust SEs,
+  separation fail and keep, both AIE kinds, balanced and unbalanced panels, IV under both
+  engines, the empirical and pilot-model routes, `n`, `mde`, the equivalence margin,
+  `curve`, three sweeps, `powerat`, `alpha` with size, an alpha rule, and two
+  statements). The file written by the 0.1.3 library before the first edit and the files
+  written after the first and after the final build are byte-identical.
+* All four tiers above were rerun on the final library: A 12/12, B 171/171, C 30/30,
+  D 45/45 PASS, and every `tier?-results.txt` **and** every `v_tier?.log` is
+  byte-identical to the committed 0.1.3 file (`git diff --quiet`; md5 of the results A
+  9abb7096..., B 7b6876b2..., C 7cb1e9b5..., D 3cc8cd2c..., as recorded on 2026-10-17).
+  Run times with four Stata jobs at once: A 13 min, B and C 3 min together, D 16 min.
+
+### Conventions and limits specific to the route
+
+* The Stata engine follows Stata: observed information for probit, the factor N/(N-1)
+  under `vce(robust)`; the Mata engine follows R (expected information, HC0). Both use
+  G/(G-1) for the cluster sandwich. The linear analysis uses the factors of `regress`
+  under both engines (HC1; G/(G-1) x (N-1)/(N-K)), as R does.
+* `separation(keep)` with `engine(stata)`: Stata's `asis` fit is kept when the separated
+  cell is the treated group's post-period cell (the treatment coefficient gets a zero
+  variance row, as on the standard route). When another group-by-period cell is separated,
+  several coefficients diverge together and the fit does not converge after 100
+  iterations (`tests/did_asis_probe_2026-11-13.do`), so the study still counts as failed
+  (in one sparse design 7.3% of studies were separated and 6.7% failed under `keep`,
+  against none under `engine(mata)`, which keeps them as R does).
+  Use `engine(mata)` when `separation(keep)` matters for these designs. The default,
+  `separation(fail)`, is the same under both engines (Tier A's failed shares).
+* `effects()` does not apply to the linear analysis (`regress` gives the estimate).
+* Not ported, because the R route does not have them either: staggered adoption,
+  period-specific effects, treatment assigned to clusters, dependence that fades with the
+  distance between periods. Not ported from R: the three-way interaction design and the
+  linear analysis of the standard routes (out of scope of this port).
+* Run times on this machine: `v_did_tierA.do` 11 min, B 1 min, C 2 min, D 25 min (three to
+  four Stata jobs at a time); `did_export_fixtures.R` 18 min (the enumeration), 
+  `did_tierD_r.R` 20 min.

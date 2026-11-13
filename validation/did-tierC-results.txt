@@ -1,0 +1,236 @@
+c1     a               Stata   -1.38629436  R   -1.38629436  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c1     b               Stata    0.98082925  R    0.98082925  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c1     l               Stata    0.53899650  R    0.53899650  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c1     th              Stata    0.00000000  R    0.00000000  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c1     de              Stata    0.28584215  R    0.28584215  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c1     c00             Stata    0.20000000  R    0.20000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c1     c01             Stata    0.30000000  R    0.30000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c1     c10             Stata    0.40000000  R    0.40000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c1     cf              Stata    0.53333333  R    0.53333333  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c1     c11             Stata    0.60333333  R    0.60333333  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c1     reading_linear  Stata    0.10333333  R    0.10333333  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c1     reading_index   Stata    0.07000000  R    0.07000000  |diff|  4.16e-17  tol  1.0e-09  PASS  closed form
+c1     signal_implied  Stata    0.00000000  R    0.00000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c1     true effect     Stata    0.07000000  R    0.07000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c1     beta1           Stata   -1.38629436  R   -1.38629436  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c1     beta2           Stata    0.98082925  R    0.98082925  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c1     beta3           Stata    0.53899650  R    0.53899650  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c1     beta4           Stata    0.28584215  R    0.28584215  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c1     length of beta  Stata    4.00000000  R    4.00000000  |diff|  0.00e+00  tol  0.0e+00  PASS  closed form
+c2     a               Stata   -0.84162123  R   -0.84162123  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c2     b               Stata    0.58827413  R    0.58827413  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c2     l               Stata    0.31722072  R    0.31722072  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c2     th              Stata   -0.06387362  R   -0.06387362  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c2     de              Stata    0.25334710  R    0.25334710  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c2     c00             Stata    0.20000000  R    0.20000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c2     c01             Stata    0.30000000  R    0.30000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c2     c10             Stata    0.40000000  R    0.40000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c2     cf              Stata    0.50000000  R    0.50000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c2     c11             Stata    0.60000000  R    0.60000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c2     reading_linear  Stata    0.10000000  R    0.10000000  |diff|  2.78e-17  tol  1.0e-09  PASS  closed form
+c2     reading_index   Stata    0.07453543  R    0.07453543  |diff|  2.78e-17  tol  1.0e-09  PASS  closed form
+c2     signal_implied  Stata    0.00000000  R    0.00000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c2     true effect     Stata    0.10000000  R    0.10000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c2     beta1           Stata   -0.84162123  R   -0.84162123  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c2     beta2           Stata    0.58827413  R    0.58827413  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c2     beta3           Stata    0.31722072  R    0.31722072  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c2     beta4           Stata    0.18947349  R    0.18947349  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c2     length of beta  Stata    4.00000000  R    4.00000000  |diff|  0.00e+00  tol  0.0e+00  PASS  closed form
+c3     a               Stata   -0.67448975  R   -0.67448975  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c3     b               Stata    0.28916928  R    0.28916928  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c3     l               Stata    0.23457658  R    0.23457658  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c3     th              Stata    0.00000000  R    0.00000000  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c3     de              Stata   -0.12834351  R   -0.12834351  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c3     c00             Stata    0.25000000  R    0.25000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c3     c01             Stata    0.33000000  R    0.33000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c3     c10             Stata    0.35000000  R    0.35000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c3     cf              Stata    0.44008888  R    0.44008888  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c3     c11             Stata    0.39008888  R    0.39008888  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c3     reading_linear  Stata   -0.03991112  R   -0.03991112  |diff|  2.08e-17  tol  1.0e-09  PASS  closed form
+c3     reading_index   Stata   -0.05000000  R   -0.05000000  |diff|  4.16e-17  tol  1.0e-09  PASS  closed form
+c3     signal_implied  Stata    0.00000000  R    0.00000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c3     true effect     Stata   -0.05000000  R   -0.05000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c3     beta1           Stata   -0.67448975  R   -0.67448975  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c3     beta2           Stata    0.28916928  R    0.28916928  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c3     beta3           Stata    0.00000000  R    0.00000000  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c3     beta4           Stata    0.23457658  R    0.23457658  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c3     beta5           Stata    0.23457658  R    0.23457658  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c3     beta6           Stata    0.23457658  R    0.23457658  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c3     beta7           Stata   -0.12834351  R   -0.12834351  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c3     length of beta  Stata    7.00000000  R    7.00000000  |diff|  0.00e+00  tol  0.0e+00  PASS  closed form
+c4     a_0             Stata   -0.84729786  R   -0.84729786  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     b_0             Stata    0.44183275  R    0.44183275  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     l_0             Stata    0.44183275  R    0.44183275  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     th_0            Stata    0.00000000  R    0.00000000  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     de_0            Stata    0.40712486  R    0.40712486  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     c00_0           Stata    0.30000000  R    0.30000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c4     c01_0           Stata    0.40000000  R    0.40000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c4     c10_0           Stata    0.40000000  R    0.40000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c4     cf_0            Stata    0.50909091  R    0.50909091  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c4     c11_0           Stata    0.60909091  R    0.60909091  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c4     a_1             Stata   -1.38629436  R   -1.38629436  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     b_1             Stata    0.76725515  R    0.76725515  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     l_1             Stata    0.28768207  R    0.28768207  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     th_1            Stata    0.00000000  R    0.00000000  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     de_1            Stata    0.12224019  R    0.12224019  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     c00_1           Stata    0.20000000  R    0.20000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c4     c01_1           Stata    0.25000000  R    0.25000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c4     c10_1           Stata    0.35000000  R    0.35000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c4     cf_1            Stata    0.41791045  R    0.41791045  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c4     c11_1           Stata    0.44791045  R    0.44791045  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c4     reading_linear  Stata   -0.06118046  R   -0.06118046  |diff|  3.47e-17  tol  1.0e-09  PASS  closed form
+c4     reading_index   Stata   -0.07000000  R   -0.07000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c4     signal_implied  Stata    0.00000000  R    0.00000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c4     true effect     Stata   -0.07000000  R   -0.07000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c4     beta1           Stata   -0.84729786  R   -0.84729786  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     beta2           Stata    0.44183275  R    0.44183275  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     beta3           Stata    0.44183275  R    0.44183275  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     beta4           Stata    0.40712486  R    0.40712486  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     beta5           Stata   -0.53899650  R   -0.53899650  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     beta6           Stata    0.32542240  R    0.32542240  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     beta7           Stata   -0.15415068  R   -0.15415068  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     beta8           Stata   -0.28488467  R   -0.28488467  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c4     length of beta  Stata    8.00000000  R    8.00000000  |diff|  0.00e+00  tol  0.0e+00  PASS  closed form
+c5     a_0             Stata   -0.52440051  R   -0.52440051  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     b_0             Stata    0.27105341  R    0.27105341  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     l_0             Stata    0.27105341  R    0.27105341  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     th_0            Stata   -0.01770631  R   -0.01770631  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     de_0            Stata    0.25334710  R    0.25334710  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     c00_0           Stata    0.30000000  R    0.30000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c5     c01_0           Stata    0.40000000  R    0.40000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c5     c10_0           Stata    0.40000000  R    0.40000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c5     cf_0            Stata    0.50000000  R    0.50000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c5     c11_0           Stata    0.60000000  R    0.60000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c5     a_1             Stata   -1.64485363  R   -1.64485363  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     b_1             Stata    0.36330206  R    0.36330206  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     l_1             Stata    0.60842024  R    0.60842024  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     th_1            Stata   -0.16848991  R   -0.16848991  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     de_1            Stata    0.10277438  R    0.10277438  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     c00_1           Stata    0.05000000  R    0.05000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c5     c01_1           Stata    0.15000000  R    0.15000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c5     c10_1           Stata    0.10000000  R    0.10000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c5     cf_1            Stata    0.20000000  R    0.20000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c5     c11_1           Stata    0.23000000  R    0.23000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c5     reading_linear  Stata   -0.07000000  R   -0.07000000  |diff|  2.78e-17  tol  1.0e-09  PASS  closed form
+c5     reading_index   Stata   -0.11336845  R   -0.11336845  |diff|  1.39e-17  tol  1.0e-09  PASS  closed form
+c5     signal_implied  Stata    0.00000000  R    0.00000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c5     true effect     Stata   -0.07000000  R   -0.07000000  |diff|  0.00e+00  tol  1.0e-09  PASS  closed form
+c5     beta1           Stata   -0.52440051  R   -0.52440051  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     beta2           Stata    0.27105341  R    0.27105341  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     beta3           Stata    0.27105341  R    0.27105341  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     beta4           Stata    0.23564080  R    0.23564080  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     beta5           Stata   -1.12045311  R   -1.12045311  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     beta6           Stata    0.09224865  R    0.09224865  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     beta7           Stata    0.33736683  R    0.33736683  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     beta8           Stata   -0.30135632  R   -0.30135632  |diff|  0.00e+00  tol  1.0e-08  PASS  closed form
+c5     length of beta  Stata    8.00000000  R    8.00000000  |diff|  0.00e+00  tol  0.0e+00  PASS  closed form
+c6     a               Stata   -1.27279246  R   -1.27480486  |diff|  2.01e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c6     b               Stata    0.22421615  R    0.22729701  |diff|  3.08e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c6     l               Stata    0.40879506  R    0.40889960  |diff|  1.05e-04  tol  1.0e-02  PASS  integration draw, nint 4e5
+c6     th              Stata    0.00000000  R    0.00000000  |diff|  0.00e+00  tol  1.0e-02  PASS  integration draw, nint 4e5
+c6     de              Stata    0.29759967  R    0.29756899  |diff|  3.07e-05  tol  1.0e-02  PASS  integration draw, nint 4e5
+c6     c00             Stata    0.25000000  R    0.25000000  |diff|  0.00e+00  tol  2.0e-03  PASS  integration draw, nint 4e5
+c6     c01             Stata    0.33000000  R    0.33000000  |diff|  0.00e+00  tol  2.0e-03  PASS  integration draw, nint 4e5
+c6     c10             Stata    0.35000000  R    0.35000000  |diff|  0.00e+00  tol  2.0e-03  PASS  integration draw, nint 4e5
+c6     cf              Stata    0.44223139  R    0.44226498  |diff|  3.36e-05  tol  2.0e-03  PASS  integration draw, nint 4e5
+c6     c11             Stata    0.51223139  R    0.51226498  |diff|  3.36e-05  tol  2.0e-03  PASS  integration draw, nint 4e5
+c6     reading_linear  Stata    0.08223139  R    0.08226498  |diff|  3.36e-05  tol  2.0e-03  PASS  integration draw, nint 4e5
+c6     reading_index   Stata    0.06913677  R    0.06917035  |diff|  3.36e-05  tol  2.0e-03  PASS  integration draw, nint 4e5
+c6     signal_implied  Stata    0.20000000  R    0.20000000  |diff|  4.08e-15  tol  2.0e-03  PASS  integration draw, nint 4e5
+c6     true effect     Stata    0.07000000  R    0.07000000  |diff|  6.54e-14  tol  2.0e-03  PASS  integration draw, nint 4e5
+c6     beta1           Stata   -1.27279246  R   -1.27480486  |diff|  2.01e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c6     beta2           Stata    0.22421615  R    0.22729701  |diff|  3.08e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c6     beta3           Stata    0.40879506  R    0.40889960  |diff|  1.05e-04  tol  1.0e-02  PASS  integration draw, nint 4e5
+c6     beta4           Stata    0.29759967  R    0.29756899  |diff|  3.07e-05  tol  1.0e-02  PASS  integration draw, nint 4e5
+c6     beta5           Stata    0.31845906  R    0.31737510  |diff|  1.08e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c6     beta6           Stata    0.65005184  R    0.64783920  |diff|  2.21e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c6     length of beta  Stata    6.00000000  R    6.00000000  |diff|  0.00e+00  tol  0.0e+00  PASS  integration draw, nint 4e5
+c6     gamma1          Stata    0.31845906  R    0.31737510  |diff|  1.08e-03  tol  5.0e-03  PASS  integration draw, nint 4e5
+c6     gamma2          Stata    0.65005184  R    0.64783920  |diff|  2.21e-03  tol  5.0e-03  PASS  integration draw, nint 4e5
+c7     a               Stata   -0.86492266  R   -0.86702021  |diff|  2.10e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c7     b               Stata    0.03966494  R    0.04284393  |diff|  3.18e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c7     l               Stata    0.26108316  R    0.26123783  |diff|  1.55e-04  tol  1.0e-02  PASS  integration draw, nint 4e5
+c7     th              Stata   -0.02717104  R   -0.02737101  |diff|  2.00e-04  tol  1.0e-02  PASS  integration draw, nint 4e5
+c7     de              Stata    0.19749703  R    0.19746020  |diff|  3.68e-05  tol  1.0e-02  PASS  integration draw, nint 4e5
+c7     c00             Stata    0.25000000  R    0.25000000  |diff|  0.00e+00  tol  2.0e-03  PASS  integration draw, nint 4e5
+c7     c01             Stata    0.33000000  R    0.33000000  |diff|  0.00e+00  tol  2.0e-03  PASS  integration draw, nint 4e5
+c7     c10             Stata    0.35000000  R    0.35000000  |diff|  0.00e+00  tol  2.0e-03  PASS  integration draw, nint 4e5
+c7     cf              Stata    0.43000000  R    0.43000000  |diff|  0.00e+00  tol  2.0e-03  PASS  integration draw, nint 4e5
+c7     c11             Stata    0.50000000  R    0.50000000  |diff|  0.00e+00  tol  2.0e-03  PASS  integration draw, nint 4e5
+c7     reading_linear  Stata    0.07000000  R    0.07000000  |diff|  5.55e-17  tol  2.0e-03  PASS  integration draw, nint 4e5
+c7     reading_index   Stata    0.05991112  R    0.05991112  |diff|  1.04e-16  tol  2.0e-03  PASS  integration draw, nint 4e5
+c7     signal_implied  Stata    0.20000000  R    0.20000000  |diff|  4.08e-15  tol  2.0e-03  PASS  integration draw, nint 4e5
+c7     true effect     Stata    0.07000000  R    0.07000000  |diff|  2.78e-16  tol  2.0e-03  PASS  integration draw, nint 4e5
+c7     beta1           Stata   -0.86492266  R   -0.86702021  |diff|  2.10e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c7     beta2           Stata    0.03966494  R    0.04284393  |diff|  3.18e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c7     beta3           Stata    0.26108316  R    0.26123783  |diff|  1.55e-04  tol  1.0e-02  PASS  integration draw, nint 4e5
+c7     beta4           Stata    0.17032599  R    0.17008918  |diff|  2.37e-04  tol  1.0e-02  PASS  integration draw, nint 4e5
+c7     beta5           Stata    0.31845906  R    0.31737510  |diff|  1.08e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c7     beta6           Stata    0.65005184  R    0.64783920  |diff|  2.21e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c7     length of beta  Stata    6.00000000  R    6.00000000  |diff|  0.00e+00  tol  0.0e+00  PASS  integration draw, nint 4e5
+c6big  a               Stata   -1.27356151  R   -1.27383812  |diff|  2.77e-04  tol  3.0e-03  PASS  integration draw, nint 4e6
+c6big  b               Stata    0.22278346  R    0.22327990  |diff|  4.96e-04  tol  3.0e-03  PASS  integration draw, nint 4e6
+c6big  l               Stata    0.40886703  R    0.40886804  |diff|  1.01e-06  tol  3.0e-03  PASS  integration draw, nint 4e6
+c6big  th              Stata    0.00000000  R    0.00000000  |diff|  0.00e+00  tol  3.0e-03  PASS  integration draw, nint 4e6
+c6big  de              Stata    0.29752073  R    0.29753242  |diff|  1.17e-05  tol  3.0e-03  PASS  integration draw, nint 4e6
+c6big  c00             Stata    0.25000000  R    0.25000000  |diff|  0.00e+00  tol  6.0e-04  PASS  integration draw, nint 4e6
+c6big  c01             Stata    0.33000000  R    0.33000000  |diff|  0.00e+00  tol  6.0e-04  PASS  integration draw, nint 4e6
+c6big  c10             Stata    0.35000000  R    0.35000000  |diff|  0.00e+00  tol  6.0e-04  PASS  integration draw, nint 4e6
+c6big  cf              Stata    0.44227218  R    0.44226855  |diff|  3.63e-06  tol  6.0e-04  PASS  integration draw, nint 4e6
+c6big  c11             Stata    0.51227218  R    0.51226855  |diff|  3.63e-06  tol  6.0e-04  PASS  integration draw, nint 4e6
+c6big  reading_linear  Stata    0.08227218  R    0.08226855  |diff|  3.63e-06  tol  6.0e-04  PASS  integration draw, nint 4e6
+c6big  reading_index   Stata    0.06917755  R    0.06917392  |diff|  3.63e-06  tol  6.0e-04  PASS  integration draw, nint 4e6
+c6big  signal_implied  Stata    0.20000000  R    0.20000000  |diff|  4.41e-15  tol  6.0e-04  PASS  integration draw, nint 4e6
+c6big  true effect     Stata    0.07000000  R    0.07000000  |diff|  8.66e-15  tol  6.0e-04  PASS  integration draw, nint 4e6
+c6big  beta1           Stata   -1.27356151  R   -1.27383812  |diff|  2.77e-04  tol  3.0e-03  PASS  integration draw, nint 4e6
+c6big  beta2           Stata    0.22278346  R    0.22327990  |diff|  4.96e-04  tol  3.0e-03  PASS  integration draw, nint 4e6
+c6big  beta3           Stata    0.40886703  R    0.40886804  |diff|  1.01e-06  tol  3.0e-03  PASS  integration draw, nint 4e6
+c6big  beta4           Stata    0.29752073  R    0.29753242  |diff|  1.17e-05  tol  3.0e-03  PASS  integration draw, nint 4e6
+c6big  beta5           Stata    0.31789406  R    0.31795487  |diff|  6.08e-05  tol  3.0e-03  PASS  integration draw, nint 4e6
+c6big  beta6           Stata    0.64889854  R    0.64902266  |diff|  1.24e-04  tol  3.0e-03  PASS  integration draw, nint 4e6
+c6big  length of beta  Stata    6.00000000  R    6.00000000  |diff|  0.00e+00  tol  0.0e+00  PASS  integration draw, nint 4e6
+c8     a_0             Stata   -0.88149211  R   -0.88162779  |diff|  1.36e-04  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     b_0             Stata    0.46132716  R    0.46081044  |diff|  5.17e-04  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     l_0             Stata    0.45895111  R    0.45892813  |diff|  2.30e-05  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     th_0            Stata    0.00000000  R    0.00000000  |diff|  0.00e+00  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     de_0            Stata    0.42395347  R    0.42403824  |diff|  8.48e-05  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     c00_0           Stata    0.30000000  R    0.30000000  |diff|  0.00e+00  tol  2.0e-03  PASS  integration draw, nint 4e5
+c8     c01_0           Stata    0.40000000  R    0.40000000  |diff|  0.00e+00  tol  2.0e-03  PASS  integration draw, nint 4e5
+c8     c10_0           Stata    0.40000000  R    0.40000000  |diff|  0.00e+00  tol  2.0e-03  PASS  integration draw, nint 4e5
+c8     cf_0            Stata    0.50877962  R    0.50874944  |diff|  3.02e-05  tol  2.0e-03  PASS  integration draw, nint 4e5
+c8     c11_0           Stata    0.60877962  R    0.60874944  |diff|  3.02e-05  tol  2.0e-03  PASS  integration draw, nint 4e5
+c8     a_1             Stata   -1.43626886  R   -1.43810507  |diff|  1.84e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     b_1             Stata    0.79505559  R    0.79280461  |diff|  2.25e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     l_1             Stata    0.29650807  R    0.29642246  |diff|  8.56e-05  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     th_1            Stata    0.00000000  R    0.00000000  |diff|  0.00e+00  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     de_1            Stata    0.12738857  R    0.12738689  |diff|  1.68e-06  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     c00_1           Stata    0.20000000  R    0.20000000  |diff|  0.00e+00  tol  2.0e-03  PASS  integration draw, nint 4e5
+c8     c01_1           Stata    0.25000000  R    0.25000000  |diff|  0.00e+00  tol  2.0e-03  PASS  integration draw, nint 4e5
+c8     c10_1           Stata    0.35000000  R    0.35000000  |diff|  0.00e+00  tol  2.0e-03  PASS  integration draw, nint 4e5
+c8     cf_1            Stata    0.41726300  R    0.41724332  |diff|  1.97e-05  tol  2.0e-03  PASS  integration draw, nint 4e5
+c8     c11_1           Stata    0.44726300  R    0.44724332  |diff|  1.97e-05  tol  2.0e-03  PASS  integration draw, nint 4e5
+c8     reading_linear  Stata   -0.06151662  R   -0.06150612  |diff|  1.05e-05  tol  2.0e-03  PASS  integration draw, nint 4e5
+c8     reading_index   Stata   -0.07033616  R   -0.07032566  |diff|  1.05e-05  tol  2.0e-03  PASS  integration draw, nint 4e5
+c8     signal_implied  Stata    0.15000000  R    0.15000000  |diff|  3.39e-15  tol  2.0e-03  PASS  integration draw, nint 4e5
+c8     true effect     Stata   -0.07000000  R   -0.07000000  |diff|  1.64e-15  tol  2.0e-03  PASS  integration draw, nint 4e5
+c8     beta1           Stata   -0.88149211  R   -0.88162779  |diff|  1.36e-04  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     beta2           Stata    0.46132716  R    0.46081044  |diff|  5.17e-04  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     beta3           Stata    0.45895111  R    0.45892813  |diff|  2.30e-05  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     beta4           Stata    0.42395347  R    0.42403824  |diff|  8.48e-05  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     beta5           Stata   -0.55477676  R   -0.55647728  |diff|  1.70e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     beta6           Stata    0.33372843  R    0.33199417  |diff|  1.73e-03  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     beta7           Stata   -0.16244303  R   -0.16250566  |diff|  6.26e-05  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     beta8           Stata   -0.29656490  R   -0.29665136  |diff|  8.65e-05  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     beta9           Stata    0.42046951  R    0.42010354  |diff|  3.66e-04  tol  1.0e-02  PASS  integration draw, nint 4e5
+c8     length of beta  Stata    9.00000000  R    9.00000000  |diff|  0.00e+00  tol  0.0e+00  PASS  integration draw, nint 4e5
+pilot  joint rate      Stata    0.15676732  R    0.15676732  |diff|  2.78e-17  tol  1.0e-09  PASS  bivariate normal
+pilot  joint rate      Stata    0.01172551  R    0.01172551  |diff|  6.77e-17  tol  1.0e-09  PASS  bivariate normal
+pilot  rho solver      Stata    0.44303202  R    0.44303202  |diff|  5.55e-17  tol  1.0e-07  PASS  method of moments
+pilot  baseline        Stata    0.21663638  R    0.21663638  |diff|  0.00e+00  tol  1.0e-12  PASS  same pilot file
+pilot  gap             Stata    0.11595566  R    0.11595566  |diff|  0.00e+00  tol  1.0e-12  PASS  same pilot file
+pilot  p_treated       Stata    0.44966667  R    0.44966667  |diff|  0.00e+00  tol  1.0e-12  PASS  same pilot file
+pilot  rho             Stata    0.37875860  R    0.37875860  |diff|  3.33e-16  tol  1.0e-07  PASS  same pilot file
+pilot  control_change  Stata    0.00908540  R    0.00908540  |diff|  0.00e+00  tol  1.0e-12  PASS  same pilot file
+pilot  n_pairs         Stata 9000.00000000  R 9000.00000000  |diff|  0.00e+00  tol  0.0e+00  PASS  same pilot file
+pilot  cf              Stata    0.39583164  R    0.39583164  |diff|  0.00e+00  tol  1.0e-09  PASS  same pilot file
+Tier C (difference-in-differences): 235 PASS, 0 FAIL

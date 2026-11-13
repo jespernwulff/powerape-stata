@@ -8,7 +8,7 @@ program powerape, rclass
     version 16
     gettoken sub 0 : 0, parse(" ,")
     local sub = lower(`"`sub'"')
-    local known dgp setape setaie describe list drop trueape trueaie power ///
+    local known dgp setape setaie setatt describe list drop trueape trueaie trueatt power ///
         curve n mde robust alpha powerat frontier statement engine version _parse
     if `"`sub'"' == "" {
         di as err "powerape: a subcommand is required (" `"`known'"' ")"
@@ -186,8 +186,20 @@ program powerape_dgp, rclass
         INSTruments(string) CORRelation(string) BASEline(string) SIGnal(real 0) ///
         GAMma(numlist) NINT(real -1) SEEDint(integer 20260812) ///
         NPERiods(numlist integer) PPERiods(numlist) RETention(string) ///
-        RHO(real 0) CREshare(real 0) ENDOGeneity(string) IVStrength(string) ///
+        RHO(string) CREshare(real 0) ENDOGeneity(string) IVStrength(string) ///
+        DID DIDPILOT GAP(numlist max=2) TREND(numlist max=2) PTReated(string) ///
+        DESign(string) PPOst(string) TRENDS(string) ANALysis(string) ///
+        NPRE(integer 1) NPOST(integer 1) SUBgroup(string) ///
+        OUTcome(string) GROUP(string) ID(string) PERiod(string) ///
         REPLACE noDISplay]
+    * rho() is a string so that the pilot route can tell "not given" from 0
+    local rho_given = ("`rho'" != "")
+    if "`rho'" == "" local rho 0
+    capture confirm number `rho'
+    if _rc {
+        di as err "rho() must be a number"
+        exit 198
+    }
     local spec_opts : copy local 0
     gettoken junk spec_opts : spec_opts, parse(",")
     local spec_opts = subinstr(`"`spec_opts'"', ",", "", 1)
@@ -196,11 +208,13 @@ program powerape_dgp, rclass
     if "`model'" == "" local model probit
     local model = lower("`model'")
     local disp = ("`display'" == "")
-    local nroutes = ("`empirical'" != "") + ("`fromfit'" != "") + ("`panel'" != "") + ("`iv'" != "")
+    local nroutes = ("`empirical'" != "") + ("`fromfit'" != "") + ("`panel'" != "") + ("`iv'" != "") + ///
+        ("`did'" != "") + ("`didpilot'" != "")
     if `nroutes' > 1 {
-        di as err "choose at most one of empirical, fromfit, panel, iv"
+        di as err "choose at most one of empirical, fromfit, panel, iv, did, didpilot"
         exit 198
     }
+    local isdid = ("`did'`didpilot'" != "")
     if "`replace'" == "" {
         mata: st_local("exists", strofreal(pape_store_has("DGP", "`dname'")))
         if `exists' {
@@ -208,7 +222,7 @@ program powerape_dgp, rclass
             exit 110
         }
     }
-    if "`baseline'" != "" {
+    if "`baseline'" != "" & !`isdid' {
         capture confirm number `baseline'
         if _rc {
             di as err "baseline() must be a number"
@@ -219,6 +233,101 @@ program powerape_dgp, rclass
     local ckind `s(kind)'
     local cscalar `s(scalar)'
     local cmat `s(matname)'
+
+    * ---- difference-in-differences (did) and its pilot-data builder ---------
+    if `isdid' {
+        if `"`focal'`moderator'`instruments'"' != "" {
+            di as err "difference-in-differences designs take no focal(), moderator() or instruments(): the group and treatment indicators are built in"
+            exit 198
+        }
+        if "`baseline'" != "" {
+            capture numlist "`baseline'", min(1) max(2)
+            if _rc {
+                di as err "baseline() must be one number, or two with subgroup()"
+                exit 198
+            }
+            local baseline `r(numlist)'
+        }
+        local design = lower("`design'")
+        if inlist("`design'", "xs", "cross", "crosssections", "cross-section", "cross_sections") local design cross-sections
+        local trends = lower("`trends'")
+        local analysis = lower("`analysis'")
+        if "`trends'" == "" local trends index
+        if "`analysis'" == "" local analysis index
+        foreach o in ppost ptreated {
+            if "``o''" != "" {
+                capture confirm number ``o''
+                if _rc {
+                    di as err "`o'() must be a number"
+                    exit 198
+                }
+            }
+        }
+        if "`ppost'" == "" local ppost .
+        local sname ""
+        local sp .
+        if `"`subgroup'"' != "" {
+            pape_parsevars `"`subgroup'"'
+            if `s(k)' != 1 | "`s(types)'" != "binary" {
+                di as err "subgroup() must describe one binary variable, e.g. subgroup(female, p(0.4))"
+                exit 198
+            }
+            local sname `s(names)'
+            local sp `s(ps)'
+        }
+        local cnames ""
+        local ctypes ""
+        local cps ""
+        local cmeans ""
+        local csds ""
+        local ciccs ""
+        if `"`covariates'"' != "" {
+            pape_parsevars `"`covariates'"'
+            local cnames `s(names)'
+            local ctypes `s(types)'
+            local cps `s(ps)'
+            local cmeans `s(means)'
+            local csds `s(sds)'
+            local ciccs `s(iccs)'
+        }
+        if `nint' < 0 local nint 4e5
+        local gstr "`gamma'"
+        if "`did'" != "" {
+            if "`baseline'" == "" {
+                di as err "baseline() is required"
+                exit 198
+            }
+            if "`design'" == "" local design panel
+            if "`ptreated'" == "" local ptreated 0.5
+            mata: pape_cmd_dgp_did("`dname'", "`model'", "`baseline'", "`gap'", "`trend'", `ptreated', ///
+                "`design'", `rho', `ppost', "`trends'", "`analysis'", `npre', `npost', "`sname'", `sp', ///
+                "`cnames'", "`ctypes'", "`cps'", "`cmeans'", "`csds'", "`ciccs'", `ckind', `cscalar', ///
+                "`cmat'", `"`covariates'"', `"`correlation'"', `signal', "`gstr'", `nint', `seedint', `disp')
+        }
+        else {
+            if "`outcome'" == "" | "`group'" == "" {
+                di as err "didpilot needs outcome(varname) and group(varname)"
+                exit 198
+            }
+            if "`sname'" != "" {
+                di as err "didpilot does not estimate subgroup designs; build those with powerape dgp NAME, did"
+                exit 198
+            }
+            confirm numeric variable `outcome' `group' `id' `period'
+            marksample touse, novarlist
+            markout `touse' `outcome' `group' `id' `period'
+            if "`ptreated'" == "" local ptreated .
+            local rho_in = cond(`rho_given', "`rho'", ".")
+            mata: pape_cmd_dgp_didpilot("`dname'", "`outcome'", "`group'", "`id'", "`period'", "`touse'", ///
+                "`model'", "`baseline'", "`gap'", "`trend'", `ptreated', "`design'", `rho_in', `ppost', ///
+                "`trends'", "`analysis'", `npre', `npost', "`cnames'", "`ctypes'", "`cps'", "`cmeans'", ///
+                "`csds'", "`ciccs'", `ckind', `cscalar', "`cmat'", `"`covariates'"', `"`correlation'"', ///
+                `signal', "`gstr'", `nint', `seedint', `disp')
+        }
+        pape_return_dgp
+        return add
+        exit
+    }
 
     * ---- fromfit -----------------------------------------------------------
     if "`fromfit'" != "" {
@@ -390,20 +499,28 @@ program powerape_dgp, rclass
 end
 
 program pape_return_dgp, rclass
-    foreach v in model route estimand focal {
+    foreach v in model route estimand focal design trends analysis subgroup {
         return local `v' `"${pape_r_`v'}"'
     }
-    foreach v in baseline signal beta0 beta_focal beta_mod beta_int target p1 k {
+    foreach v in baseline signal beta0 beta_focal beta_mod beta_int target p1 k ///
+        p_treated p_post rho n_pre n_post reading_linear reading_index att_ref att_sub {
         capture return scalar `v' = scalar(pape_r_`v')
     }
     capture return matrix gamma = pape_r_gamma
+    * difference-in-differences designs only
+    capture return matrix rates = pape_r_rates
+    capture return matrix didcoef = pape_r_didcoef
+    capture return matrix pilot = pape_r_pilot
     pape_clear_r
 end
 
 program pape_clear_r
     capture macro drop pape_r_*
-    foreach v in baseline signal beta0 beta_focal beta_mod beta_int target p1 k power mcse n nsim alpha conf sesoi separated min_cell n_failed goal confirmed nsim_confirm mde is_margin value worst nmax nmax_power nmax_mcse nmax_scenario beta wcer power_default wcer_default range_lo range_hi capped cap alpha_uncapped wcer_uncapped size size_mcse size_truth {
+    foreach v in baseline signal beta0 beta_focal beta_mod beta_int target p1 k power mcse n nsim alpha conf sesoi separated min_cell n_failed goal confirmed nsim_confirm mde is_margin value worst nmax nmax_power nmax_mcse nmax_scenario beta wcer power_default wcer_default range_lo range_hi capped cap alpha_uncapped wcer_uncapped size size_mcse size_truth p_treated p_post rho n_pre n_post reading_linear reading_index att_ref att_sub est_mean est_mcse valid {
         capture scalar drop pape_r_`v'
+    }
+    foreach m in rates didcoef pilot {
+        capture matrix drop pape_r_`m'
     }
 end
 
@@ -424,6 +541,25 @@ program powerape_setaie, rclass
     mata: pape_cmd_setaie("`dname'", `target', `mainfocal', `mainmoderator', `disp')
     pape_return_dgp
     return add
+end
+
+* pin the effect on the treated of a difference-in-differences design: one
+* number, or with a subgroup the two subgroups' effects (reference first)
+program powerape_setatt, rclass
+    syntax name(name=dname id="DGP name"), Target(numlist min=1 max=2) [noDISplay]
+    local disp = ("`display'" == "")
+    mata: pape_cmd_setatt("`dname'", "`target'", `disp')
+    pape_return_dgp
+    return add
+end
+
+program powerape_trueatt, rclass
+    syntax name(name=dname id="DGP name")
+    mata: pape_cmd_trueatt("`dname'")
+    return scalar att = scalar(pape_r_value)
+    capture return scalar att_ref = scalar(pape_r_att_ref)
+    capture return scalar att_sub = scalar(pape_r_att_sub)
+    pape_clear_r
 end
 
 program powerape_describe, rclass
@@ -689,7 +825,7 @@ program powerape_robust, rclass
     foreach v in worst nmax nmax_power nmax_mcse nmax_scenario {
         capture return scalar `v' = scalar(pape_r_`v')
     }
-    foreach v in fit engine effects {
+    foreach v in fit engine effects analysis {
         return local `v' `"${pape_r_`v'}"'
     }
     pape_clear_r
@@ -762,10 +898,10 @@ end
 * forwards them with c_local.
 * ---------------------------------------------------------------------------
 program pape_post, rclass
-    foreach v in power mcse n nsim alpha conf sesoi target separated min_cell n_failed goal confirmed nsim_confirm mde is_margin {
+    foreach v in power mcse n nsim alpha conf sesoi target separated min_cell n_failed goal confirmed nsim_confirm mde is_margin est_mean est_mcse valid {
         capture return scalar `v' = scalar(pape_r_`v')
     }
-    foreach v in name kind claim estimand model se separation direction dgp alpharule engine effects fit {
+    foreach v in name kind claim estimand model se separation direction dgp alpharule engine effects fit analysis trends {
         return local `v' `"${pape_r_`v'}"'
     }
     if "${pape_r_has_outcomes}" == "1" return matrix outcomes = pape_r_outcomes

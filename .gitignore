@@ -25,4 +25,10 @@
 !/validation/export_fixtures.R
 !/validation/tierD_r.R
 !/validation/tierD_r.log
+!/validation/v_did_tier?.do
+!/validation/v_did_tier?.log
+!/validation/did-tier?-results.txt
+!/validation/did_export_fixtures.R
+!/validation/did_tierD_r.R
+!/validation/did_tierD_r.log
 !/validation/data/

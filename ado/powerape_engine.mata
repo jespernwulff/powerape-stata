@@ -352,6 +352,8 @@ struct pape_sim scalar pape_sim_ci(struct pape_dgp scalar d, real scalar n,
     real scalar z, is_aie, is_panel, is_iv, sep_fail, fb, mb, r, s_, ape_v
     real scalar use_stata, use_margins, frame_open, ape_m, se_m, closed
     string scalar st, vce
+    // difference-in-differences designs have their own loop (powerape_did.mata)
+    if (d.route == "did") return(pape_sim_ci_did(d, n, nsim, conf, seed, se_type, separation))
     z = pape_zcrit(conf)
     is_aie = (d.estimand == "aie")
     is_panel = (d.route == "panel")
@@ -486,7 +488,8 @@ void pape_check_coherence(struct pape_dgp scalar d, string scalar claim,
     string scalar lab
     real scalar t_abs
     if (!d.has_effect)
-        pape_err("This DGP has no target effect yet; run powerape setape (or setaie) first.")
+        pape_err(d.route == "did" ? "This DGP has no target effect yet; run powerape setatt first." :
+            "This DGP has no target effect yet; run powerape setape (or setaie) first.")
     lab = strupper(d.estimand == "" ? "ape" : d.estimand)
     t_abs = abs(d.target_est)
     if (claim == "minimum" | claim == "equivalence") {
@@ -555,7 +558,7 @@ real scalar pape_sparse_warning(real scalar separated, real scalar min_cell,
     string scalar separation, string scalar where, real scalar aie)
 {
     string scalar cell, msg
-    cell = (aie ? "focal-by-moderator cell" : "focal cell")
+    cell = (aie == 1 ? "focal-by-moderator cell" : (aie == 2 ? pape_cell_label("att") : (aie == 3 ? pape_cell_label("datt") : "focal cell")))
     msg = ""
     if (separated != . & separated > 0.01)
         msg = sprintf("%3.1f%% of simulated studies had separation (a %s with no events or no non-events, where the maximum-likelihood effect does not exist)%s",
@@ -588,11 +591,18 @@ struct pape_res scalar pape_power_once(struct pape_dgp scalar d, real scalar n,
     real rowvector lv
     string scalar se_use
     if (n == . | n < 20) pape_err("n() must be at least 20.")
-    if (d.route == "panel" & n < 30)
+    if (pape_unit_design(d) & n < 30)
         printf("{err}warning: fewer than 30 units (clusters): cluster-robust inference is unreliable at this size.\n")
     lv = pape_claim_levels(claim, alpha, conf, n, rule)
     if (nsim == . | nsim < 20) pape_err("nsim() must be at least 20.")
     se_use = se
+    if (se != "model" & pape_did_se_fixed(d)) {
+        // the linear probability analysis is robust by construction, so asking
+        // for robust standard errors there is not worth a warning
+        if (d.analysis != "linear")
+            printf("{err}warning: se() is fixed by the route: panel designs use unit-clustered SEs; se(%s) is ignored.\n", se)
+        se_use = "model"
+    }
     if (se != "model" & (d.route == "panel" | d.route == "iv")) {
         printf("{err}warning: se() is fixed by the route: panel designs use unit-clustered SEs, IV designs the stacked robust sandwich; se(%s) is ignored.\n", se)
         se_use = "model"
@@ -600,6 +610,13 @@ struct pape_res scalar pape_power_once(struct pape_dgp scalar d, real scalar n,
     if (enforce) pape_check_coherence(d, claim, sesoi, lv[4])
     sim = pape_sim_ci(d, n, nsim, lv[4], seed, se_use, separation)
     pape_summarize_sim(sim, d.target_est, claim, sesoi, nsim, lv[1], r)
+    if (d.route == "did") {
+        // the mean of the usable estimates: in a world whose trends are
+        // parallel on another scale than the analysis assumes it shows where
+        // the analysis centres
+        r.est_mean = (any(sim.ok) ? mean(select(sim.est, sim.ok)) : .)
+        r.est_mcse = (sum(sim.ok) > 1 ? sqrt(variance(select(sim.est, sim.ok)) / sum(sim.ok)) : .)
+    }
     r.kind = "power"
     r.claim = claim; r.sesoi = sesoi; r.conf = lv[4]; r.alpha = lv[1]
     r.alpha_rule = rule; r.has_rule = (rule != "")
@@ -630,7 +647,7 @@ void pape_print_sep_note(struct pape_res scalar x)
     string scalar cell
     sepd = (x.separated == . ? 0 : x.separated)
     keep = (x.separation == "keep")
-    cell = (x.estimand == "aie" ? "focal-by-moderator cell" : "focal cell")
+    cell = pape_cell_label(x.estimand)
     if (x.kind == "power") {
         other = x.outcomes[cols(x.outcomes)] - (keep ? 0 : sepd)
         if (other > 1e-12)
@@ -654,7 +671,7 @@ string scalar pape_claim_lab(string scalar claim, real scalar sesoi)
 
 string scalar pape_n_lab(struct pape_res scalar x)
 {
-    if (x.dgp.route == "panel")
+    if (pape_unit_design(x.dgp))
         return(sprintf("n = %f units x %s periods (%s obs)", x.n, pape_panel_len_label(x.dgp), pape_panel_obs_label(x.dgp, x.n)))
     return(sprintf("n = %f", x.n))
 }
@@ -662,6 +679,7 @@ string scalar pape_n_lab(struct pape_res scalar x)
 string scalar pape_se_lab(struct pape_res scalar x)
 {
     if (x.dgp.route == "iv") return(", stacked robust SEs")
+    if (pape_did_linear(x.dgp)) return(pape_did_se_label(x.dgp))
     if (x.se == "robust") return(", robust SEs")
     return("")
 }
@@ -674,9 +692,15 @@ void pape_print_power(struct pape_res scalar x)
     if (x.has_rule) al_lab = sprintf("alpha = %6.4g by sample-size rule", x.alpha)
     else al_lab = sprintf("alpha = %g", x.alpha)
     printf("  %s, %s, assumed true %s %s%7.4f, %6.4g%% CI (%s), nsim = %f%s\n",
-        x.model, pape_n_lab(x), strupper(x.estimand), pape_sgn(x.target), x.target, 100 * x.conf, al_lab, x.nsim, pape_se_lab(x))
+        pape_model_label(x.dgp), pape_n_lab(x), strupper(x.estimand), pape_sgn(x.target), x.target, 100 * x.conf, al_lab, x.nsim, pape_se_lab(x))
     printf("  fit: %s\n", x.fit)
-    printf("  power = %5.3f (MCSE %5.3f)\n", x.power, x.mcse)
+    if (x.dgp.route == "did" & !pape_did_valid(x.dgp)) {
+        // the analysis assumes another parallel-trends scale than the world has
+        printf("  rejection rate = %5.3f (MCSE %5.3f) -- not power: the simulated world has %s-parallel trends,\n", x.power, x.mcse, x.dgp.trends)
+        printf("    the %s analysis assumes %s-parallel trends; its estimates average %s, the true %s is %s\n",
+            pape_model_label(x.dgp), x.dgp.analysis, pape_fsgn(x.est_mean), strupper(x.estimand), pape_fsgn(x.target))
+    }
+    else printf("  power = %5.3f (MCSE %5.3f)\n", x.power, x.mcse)
     o = ""
     for (j = 1; j <= cols(x.outcomes); j++)
         o = o + (j > 1 ? " | " : "") + sprintf("%s %5.3f", subinstr(x.outnames[j], "_", "-", .), x.outcomes[j])

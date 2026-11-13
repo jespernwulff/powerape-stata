@@ -1,0 +1,227 @@
+case  item            against                                     Stata      reference     |diff|      tol
+did   sum_y           the data R wrote                     323.00000000   323.00000000   0.00e+00  0.0e+00 PASS
+did   b1              R fit_index_model                     -0.98918930    -0.98918930   4.44e-16  1.0e-06 PASS
+did   b2              R fit_index_model                      0.45709976     0.45709976   2.39e-15  1.0e-06 PASS
+did   b3              R fit_index_model                      0.61176904     0.61176904   1.11e-15  1.0e-06 PASS
+did   b4              R fit_index_model                      0.15702545     0.15702545   1.44e-15  1.0e-06 PASS
+did   b5              R fit_index_model                      0.39564632     0.39564632   7.77e-16  1.0e-06 PASS
+did   jac1            R att_est / datt_est                  -0.00308085    -0.00308085   6.07e-18  1.0e-06 PASS
+did   jac2            R att_est / datt_est                  -0.00308085    -0.00308085   6.07e-18  1.0e-06 PASS
+did   jac3            R att_est / datt_est                  -0.00308085    -0.00308085   6.07e-18  1.0e-06 PASS
+did   jac4            R att_est / datt_est                   0.23737574     0.23737574   2.78e-17  1.0e-06 PASS
+did   jac5            R att_est / datt_est                  -0.00667408    -0.00667408   7.20e-17  1.0e-06 PASS
+did   est             R, engine(mata)                        0.03754982     0.03754982   3.40e-16  1.0e-07 PASS
+did   se_cluster      R, engine(mata)                        0.06701908     0.06701905   3.36e-08  1.0e-06 PASS
+did   est             R, engine(stata) closed                0.03754982     0.03754982   1.71e-13  1.0e-05 PASS
+did   se_cluster      R, engine(stata) closed                0.06701908     0.06701905   3.36e-08  1.0e-05 PASS
+did   est             R, engine(stata) margins               0.03754982     0.03754982   1.71e-13  1.0e-05 PASS
+did   se_cluster      R, engine(stata) margins               0.06701908     0.06701905   3.36e-08  1.0e-05 PASS
+did   est             margins = closed form                  0.03754982     0.03754982   5.55e-17  1.0e-07 PASS
+did   se_cluster      margins = closed form                  0.06701908     0.06701908   6.94e-17  1.0e-06 PASS
+did   lin_b           R fit_ols, engine(mata)                0.05248397     0.05248397   4.37e-16  1.0e-09 PASS
+did   lin_se_cluster  R vcov_ols, engine(mata)               0.06166057     0.06166057   5.07e-16  1.0e-09 PASS
+did   lin_b           R fit_ols, engine(stata) regress       0.05248397     0.05248397   2.44e-15  1.0e-09 PASS
+did   lin_se_cluster  R vcov_ols, engine(stata) regress      0.06166057     0.06166057   1.73e-16  1.0e-09 PASS
+didx  sum_y           the data R wrote                     528.00000000   528.00000000   0.00e+00  0.0e+00 PASS
+didx  b1              R fit_index_model                     -0.99535394    -0.99535394   3.44e-15  1.0e-06 PASS
+didx  b2              R fit_index_model                      0.58652568     0.58652568   6.44e-15  1.0e-06 PASS
+didx  b3              R fit_index_model                      0.12510872     0.12510872   1.42e-14  1.0e-06 PASS
+didx  b4              R fit_index_model                      0.60058214     0.60058214   1.30e-14  1.0e-06 PASS
+didx  b5              R fit_index_model                      0.57502214     0.57502214   5.55e-15  1.0e-06 PASS
+didx  b6              R fit_index_model                      0.37510529     0.37510529   4.44e-15  1.0e-06 PASS
+didx  jac1            R att_est / datt_est                  -0.01624243    -0.01624243   3.50e-16  1.0e-06 PASS
+didx  jac2            R att_est / datt_est                  -0.01624243    -0.01624243   3.50e-16  1.0e-06 PASS
+didx  jac3            R att_est / datt_est                   0.00000000     0.00000000   0.00e+00  1.0e-06 PASS
+didx  jac4            R att_est / datt_est                  -0.00821105    -0.00821105   2.46e-16  1.0e-06 PASS
+didx  jac5            R att_est / datt_est                  -0.00803138    -0.00803138   9.19e-17  1.0e-06 PASS
+didx  jac6            R att_est / datt_est                   0.23176223     0.23176223   3.05e-16  1.0e-06 PASS
+didx  est             R, engine(mata)                        0.09045806     0.09045806   9.44e-16  1.0e-07 PASS
+didx  se_model        R, engine(mata)                        0.05937185     0.05937183   1.25e-08  1.0e-06 PASS
+didx  est             R, engine(stata) closed                0.09045808     0.09045806   1.90e-08  1.0e-05 PASS
+didx  se_model        R, engine(stata) closed                0.05937185     0.05937183   1.25e-08  1.0e-05 PASS
+didx  est             R, engine(stata) margins               0.09045808     0.09045806   1.90e-08  1.0e-05 PASS
+didx  se_model        R, engine(stata) margins               0.05937185     0.05937183   1.25e-08  1.0e-05 PASS
+didx  est             margins = closed form                  0.09045808     0.09045808   9.71e-17  1.0e-07 PASS
+didx  se_model        margins = closed form                  0.05937185     0.05937185   0.00e+00  1.0e-06 PASS
+didx  lin_b           R fit_ols, engine(mata)                0.10382779     0.10382779   7.08e-16  1.0e-09 PASS
+didx  lin_se_hc1      R vcov_ols, engine(mata)               0.05562467     0.05562467   2.08e-17  1.0e-09 PASS
+didx  lin_b           R fit_ols, engine(stata) regress       0.10382779     0.10382779   6.56e-15  1.0e-09 PASS
+didx  lin_se_hc1      R vcov_ols, engine(stata) regress      0.05562467     0.05562467   2.37e-15  1.0e-09 PASS
+didx  sum_y           the data R wrote                     528.00000000   528.00000000   0.00e+00  0.0e+00 PASS
+didx  b1              R fit_index_model                     -0.99535394    -0.99535394   3.44e-15  1.0e-06 PASS
+didx  b2              R fit_index_model                      0.58652568     0.58652568   6.44e-15  1.0e-06 PASS
+didx  b3              R fit_index_model                      0.12510872     0.12510872   1.42e-14  1.0e-06 PASS
+didx  b4              R fit_index_model                      0.60058214     0.60058214   1.30e-14  1.0e-06 PASS
+didx  b5              R fit_index_model                      0.57502214     0.57502214   5.55e-15  1.0e-06 PASS
+didx  b6              R fit_index_model                      0.37510529     0.37510529   4.44e-15  1.0e-06 PASS
+didx  jac1            R att_est / datt_est                  -0.01624243    -0.01624243   3.50e-16  1.0e-06 PASS
+didx  jac2            R att_est / datt_est                  -0.01624243    -0.01624243   3.50e-16  1.0e-06 PASS
+didx  jac3            R att_est / datt_est                   0.00000000     0.00000000   0.00e+00  1.0e-06 PASS
+didx  jac4            R att_est / datt_est                  -0.00821105    -0.00821105   2.46e-16  1.0e-06 PASS
+didx  jac5            R att_est / datt_est                  -0.00803138    -0.00803138   9.19e-17  1.0e-06 PASS
+didx  jac6            R att_est / datt_est                   0.23176223     0.23176223   3.05e-16  1.0e-06 PASS
+didx  est             R, engine(mata)                        0.09045806     0.09045806   9.44e-16  1.0e-07 PASS
+didx  se_robust       R, engine(mata)                        0.05934543     0.05934540   2.49e-08  1.0e-06 PASS
+didx  est             R, engine(stata) closed                0.09045808     0.09045806   1.90e-08  1.0e-05 PASS
+didx  se_robust       R, engine(stata) closed                0.05937017     0.05934540   2.48e-05  1.0e-03 PASS
+didx  est             R, engine(stata) margins               0.09045808     0.09045806   1.90e-08  1.0e-05 PASS
+didx  se_robust       R, engine(stata) margins               0.05937017     0.05934540   2.48e-05  1.0e-03 PASS
+didx  est             margins = closed form                  0.09045808     0.09045808   1.25e-16  1.0e-07 PASS
+didx  se_robust       margins = closed form                  0.05937017     0.05937017   3.47e-17  1.0e-06 PASS
+didx  lin_b           R fit_ols, engine(mata)                0.10382779     0.10382779   7.08e-16  1.0e-09 PASS
+didx  lin_se_hc1      R vcov_ols, engine(mata)               0.05562467     0.05562467   2.08e-17  1.0e-09 PASS
+didx  lin_b           R fit_ols, engine(stata) regress       0.10382779     0.10382779   6.56e-15  1.0e-09 PASS
+didx  lin_se_hc1      R vcov_ols, engine(stata) regress      0.05562467     0.05562467   2.37e-15  1.0e-09 PASS
+sub   sum_y           the data R wrote                     501.00000000   501.00000000   0.00e+00  0.0e+00 PASS
+sub   b1              R fit_index_model                     -0.87707002    -0.87707002   4.81e-14  1.0e-06 PASS
+sub   b2              R fit_index_model                      0.65639866     0.65639866   5.65e-14  1.0e-06 PASS
+sub   b3              R fit_index_model                      0.35719456     0.35719456   5.68e-14  1.0e-06 PASS
+sub   b4              R fit_index_model                      0.12875794     0.12875794   6.00e-14  1.0e-06 PASS
+sub   b5              R fit_index_model                      0.07731310     0.07731310   7.11e-14  1.0e-06 PASS
+sub   b6              R fit_index_model                     -0.25467187    -0.25467187   8.11e-14  1.0e-06 PASS
+sub   b7              R fit_index_model                     -0.39368567    -0.39368567   8.18e-14  1.0e-06 PASS
+sub   b8              R fit_index_model                      1.01233350     1.01233350   7.77e-14  1.0e-06 PASS
+sub   jac1            R att_est / datt_est                  -0.01415380    -0.01415380   1.08e-15  1.0e-06 PASS
+sub   jac2            R att_est / datt_est                  -0.01415380    -0.01415380   1.08e-15  1.0e-06 PASS
+sub   jac3            R att_est / datt_est                  -0.01415380    -0.01415380   1.08e-15  1.0e-06 PASS
+sub   jac4            R att_est / datt_est                  -0.02443140    -0.02443140   8.33e-16  1.0e-06 PASS
+sub   jac5            R att_est / datt_est                  -0.01733980    -0.01733980   2.11e-15  1.0e-06 PASS
+sub   jac6            R att_est / datt_est                  -0.01733980    -0.01733980   2.11e-15  1.0e-06 PASS
+sub   jac7            R att_est / datt_est                  -0.01733980    -0.01733980   2.11e-15  1.0e-06 PASS
+sub   jac8            R att_est / datt_est                   0.22122130     0.22122130   7.22e-16  1.0e-06 PASS
+sub   est             R, engine(mata)                        0.24473946     0.24473946   1.93e-14  1.0e-07 PASS
+sub   se_cluster      R, engine(mata)                        0.11351771     0.11351766   4.94e-08  1.0e-06 PASS
+sub   by0             R datt_est                             0.03185618     0.03185618   1.48e-14  1.0e-07 PASS
+sub   by1             R datt_est                             0.27659564     0.27659564   4.50e-15  1.0e-07 PASS
+sub   est             R, engine(stata) closed                0.24473945     0.24473946   3.94e-09  1.0e-05 PASS
+sub   se_cluster      R, engine(stata) closed                0.11351771     0.11351766   4.93e-08  1.0e-05 PASS
+sub   est             R, engine(stata) margins               0.24473945     0.24473946   3.94e-09  1.0e-05 PASS
+sub   se_cluster      R, engine(stata) margins               0.11351771     0.11351766   4.93e-08  1.0e-05 PASS
+sub   est             margins = closed form                  0.24473945     0.24473945   1.11e-16  1.0e-07 PASS
+sub   se_cluster      margins = closed form                  0.11351771     0.11351771   3.05e-16  1.0e-06 PASS
+sub   lin_b           R fit_ols, engine(mata)                0.23382601     0.23382601   5.61e-15  1.0e-09 PASS
+sub   lin_se_cluster  R vcov_ols, engine(mata)               0.10772641     0.10772641   1.40e-15  1.0e-09 PASS
+sub   lin_b           R fit_ols, engine(stata) regress       0.23382601     0.23382601   5.25e-15  1.0e-09 PASS
+sub   lin_se_cluster  R vcov_ols, engine(stata) regress      0.10772641     0.10772641   1.42e-14  1.0e-09 PASS
+rp    sum_y           the data R wrote                     776.00000000   776.00000000   0.00e+00  0.0e+00 PASS
+rp    b1              R fit_index_model                     -0.71111266    -0.71111266   4.55e-15  1.0e-06 PASS
+rp    b2              R fit_index_model                      0.23336402     0.23336402   4.19e-15  1.0e-06 PASS
+rp    b3              R fit_index_model                      0.16406714     0.16406714   1.80e-15  1.0e-06 PASS
+rp    b4              R fit_index_model                      0.38182953     0.38182953   4.50e-15  1.0e-06 PASS
+rp    b5              R fit_index_model                      0.41292524     0.41292524   5.72e-15  1.0e-06 PASS
+rp    b6              R fit_index_model                      0.08658237     0.08658237   4.52e-15  1.0e-06 PASS
+rp    b7              R fit_index_model                      0.52806045     0.52806045   2.22e-16  1.0e-06 PASS
+rp    jac1            R att_est / datt_est                  -0.00218265    -0.00218265   6.72e-17  1.0e-06 PASS
+rp    jac2            R att_est / datt_est                  -0.00218265    -0.00218265   6.72e-17  1.0e-06 PASS
+rp    jac3            R att_est / datt_est                   0.00000000     0.00000000   0.00e+00  1.0e-06 PASS
+rp    jac4            R att_est / datt_est                  -0.00090689    -0.00090689   2.26e-17  1.0e-06 PASS
+rp    jac5            R att_est / datt_est                  -0.00127576    -0.00127576   4.45e-17  1.0e-06 PASS
+rp    jac6            R att_est / datt_est                   0.35063508     0.35063508   1.11e-16  1.0e-06 PASS
+rp    jac7            R att_est / datt_est                  -0.01289187    -0.01289187   6.57e-16  1.0e-06 PASS
+rp    est             R, engine(mata)                        0.03046813     0.03046813   1.59e-15  1.0e-07 PASS
+rp    se_cluster      R, engine(mata)                        0.03666086     0.03666085   9.06e-09  1.0e-06 PASS
+rp    est             R, engine(stata) closed                0.03046814     0.03046813   7.09e-09  1.0e-05 PASS
+rp    se_cluster      R, engine(stata) closed                0.03664019     0.03666085   2.07e-05  1.0e-02 PASS
+rp    est             R, engine(stata) margins               0.03046814     0.03046813   7.09e-09  1.0e-05 PASS
+rp    se_cluster      R, engine(stata) margins               0.03664019     0.03666085   2.07e-05  1.0e-02 PASS
+rp    est             margins = closed form                  0.03046814     0.03046814   2.43e-17  1.0e-07 PASS
+rp    se_cluster      margins = closed form                  0.03664019     0.03664019   2.08e-17  1.0e-06 PASS
+rp    lin_b           R fit_ols, engine(mata)                0.04208269     0.04208269   8.33e-17  1.0e-09 PASS
+rp    lin_se_cluster  R vcov_ols, engine(mata)               0.03403136     0.03403136   2.08e-17  1.0e-09 PASS
+rp    lin_b           R fit_ols, engine(stata) regress       0.04208269     0.04208269   2.29e-14  1.0e-09 PASS
+rp    lin_se_cluster  R vcov_ols, engine(stata) regress      0.03403136     0.03403136   1.37e-15  1.0e-09 PASS
+rs    sum_y           the data R wrote                    1192.00000000  1192.00000000   0.00e+00  0.0e+00 PASS
+rs    b1              R fit_index_model                     -0.72381258    -0.72381258   1.75e-14  1.0e-06 PASS
+rs    b2              R fit_index_model                      0.44163089     0.44163089   2.00e-14  1.0e-06 PASS
+rs    b3              R fit_index_model                      0.16811070     0.16811070   2.07e-14  1.0e-06 PASS
+rs    b4              R fit_index_model                      0.29920206     0.29920206   2.06e-14  1.0e-06 PASS
+rs    b5              R fit_index_model                      0.41409960     0.41409960   2.16e-14  1.0e-06 PASS
+rs    b6              R fit_index_model                     -0.78651160    -0.78651160   2.46e-14  1.0e-06 PASS
+rs    b7              R fit_index_model                      0.37085867     0.37085867   2.57e-14  1.0e-06 PASS
+rs    b8              R fit_index_model                      0.07391081     0.07391081   2.98e-14  1.0e-06 PASS
+rs    b9              R fit_index_model                      0.04065846     0.04065846   2.63e-14  1.0e-06 PASS
+rs    b10             R fit_index_model                     -0.17166855    -0.17166855   3.24e-14  1.0e-06 PASS
+rs    b11             R fit_index_model                      0.40531270     0.40531270   3.33e-16  1.0e-06 PASS
+rs    jac1            R att_est / datt_est                   0.01610841     0.01610841   4.44e-16  1.0e-06 PASS
+rs    jac2            R att_est / datt_est                   0.01610841     0.01610841   4.44e-16  1.0e-06 PASS
+rs    jac3            R att_est / datt_est                   0.00705330     0.00705330   3.50e-16  1.0e-06 PASS
+rs    jac4            R att_est / datt_est                   0.00905511     0.00905511   9.19e-17  1.0e-06 PASS
+rs    jac5            R att_est / datt_est                   0.00738008     0.00738008   1.39e-16  1.0e-06 PASS
+rs    jac6            R att_est / datt_est                   0.00784345     0.00784345   3.49e-16  1.0e-06 PASS
+rs    jac7            R att_est / datt_est                   0.00784345     0.00784345   3.49e-16  1.0e-06 PASS
+rs    jac8            R att_est / datt_est                   0.00462782     0.00462782   2.37e-16  1.0e-06 PASS
+rs    jac9            R att_est / datt_est                   0.00321563     0.00321563   1.12e-16  1.0e-06 PASS
+rs    jac10           R att_est / datt_est                   0.23923395     0.23923395   8.33e-17  1.0e-06 PASS
+rs    jac11           R att_est / datt_est                   0.00881466     0.00881466   1.35e-15  1.0e-06 PASS
+rs    est             R, engine(mata)                       -0.04116440    -0.04116440   7.72e-15  1.0e-07 PASS
+rs    se_model        R, engine(mata)                        0.08247740     0.08247739   8.97e-09  1.0e-06 PASS
+rs    by0             R datt_est                             0.09832991     0.09832991   5.22e-15  1.0e-07 PASS
+rs    by1             R datt_est                             0.05716552     0.05716552   2.50e-15  1.0e-07 PASS
+rs    est             R, engine(stata) closed               -0.04116440    -0.04116440   6.42e-13  1.0e-05 PASS
+rs    se_model        R, engine(stata) closed                0.08247740     0.08247739   8.97e-09  1.0e-05 PASS
+rs    est             R, engine(stata) margins              -0.04116440    -0.04116440   6.41e-13  1.0e-05 PASS
+rs    se_model        R, engine(stata) margins               0.08247740     0.08247739   8.97e-09  1.0e-05 PASS
+rs    est             margins = closed form                 -0.04116440    -0.04116440   4.16e-16  1.0e-07 PASS
+rs    se_model        margins = closed form                  0.08247740     0.08247740   1.11e-16  1.0e-06 PASS
+rs    lin_b           R fit_ols, engine(mata)               -0.03067982    -0.03067982   3.29e-15  1.0e-09 PASS
+rs    lin_se_hc1      R vcov_ols, engine(mata)               0.07185643     0.07185643   2.50e-16  1.0e-09 PASS
+rs    lin_b           R fit_ols, engine(stata) regress      -0.03067982    -0.03067982   7.29e-15  1.0e-09 PASS
+rs    lin_se_hc1      R vcov_ols, engine(stata) regress      0.07185643     0.07185643   1.70e-14  1.0e-09 PASS
+rs    sum_y           the data R wrote                    1192.00000000  1192.00000000   0.00e+00  0.0e+00 PASS
+rs    b1              R fit_index_model                     -0.72381258    -0.72381258   1.75e-14  1.0e-06 PASS
+rs    b2              R fit_index_model                      0.44163089     0.44163089   2.00e-14  1.0e-06 PASS
+rs    b3              R fit_index_model                      0.16811070     0.16811070   2.07e-14  1.0e-06 PASS
+rs    b4              R fit_index_model                      0.29920206     0.29920206   2.06e-14  1.0e-06 PASS
+rs    b5              R fit_index_model                      0.41409960     0.41409960   2.16e-14  1.0e-06 PASS
+rs    b6              R fit_index_model                     -0.78651160    -0.78651160   2.46e-14  1.0e-06 PASS
+rs    b7              R fit_index_model                      0.37085867     0.37085867   2.57e-14  1.0e-06 PASS
+rs    b8              R fit_index_model                      0.07391081     0.07391081   2.98e-14  1.0e-06 PASS
+rs    b9              R fit_index_model                      0.04065846     0.04065846   2.63e-14  1.0e-06 PASS
+rs    b10             R fit_index_model                     -0.17166855    -0.17166855   3.24e-14  1.0e-06 PASS
+rs    b11             R fit_index_model                      0.40531270     0.40531270   3.33e-16  1.0e-06 PASS
+rs    jac1            R att_est / datt_est                   0.01610841     0.01610841   4.44e-16  1.0e-06 PASS
+rs    jac2            R att_est / datt_est                   0.01610841     0.01610841   4.44e-16  1.0e-06 PASS
+rs    jac3            R att_est / datt_est                   0.00705330     0.00705330   3.50e-16  1.0e-06 PASS
+rs    jac4            R att_est / datt_est                   0.00905511     0.00905511   9.19e-17  1.0e-06 PASS
+rs    jac5            R att_est / datt_est                   0.00738008     0.00738008   1.39e-16  1.0e-06 PASS
+rs    jac6            R att_est / datt_est                   0.00784345     0.00784345   3.49e-16  1.0e-06 PASS
+rs    jac7            R att_est / datt_est                   0.00784345     0.00784345   3.49e-16  1.0e-06 PASS
+rs    jac8            R att_est / datt_est                   0.00462782     0.00462782   2.37e-16  1.0e-06 PASS
+rs    jac9            R att_est / datt_est                   0.00321563     0.00321563   1.12e-16  1.0e-06 PASS
+rs    jac10           R att_est / datt_est                   0.23923395     0.23923395   8.33e-17  1.0e-06 PASS
+rs    jac11           R att_est / datt_est                   0.00881466     0.00881466   1.35e-15  1.0e-06 PASS
+rs    est             R, engine(mata)                       -0.04116440    -0.04116440   7.72e-15  1.0e-07 PASS
+rs    se_robust       R, engine(mata)                        0.08254154     0.08254152   1.80e-08  1.0e-06 PASS
+rs    by0             R datt_est                             0.09832991     0.09832991   5.22e-15  1.0e-07 PASS
+rs    by1             R datt_est                             0.05716552     0.05716552   2.50e-15  1.0e-07 PASS
+rs    est             R, engine(stata) closed               -0.04116440    -0.04116440   6.42e-13  1.0e-05 PASS
+rs    se_robust       R, engine(stata) closed                0.08255530     0.08254152   1.38e-05  1.0e-03 PASS
+rs    est             R, engine(stata) margins              -0.04116440    -0.04116440   6.41e-13  1.0e-05 PASS
+rs    se_robust       R, engine(stata) margins               0.08255530     0.08254152   1.38e-05  1.0e-03 PASS
+rs    est             margins = closed form                 -0.04116440    -0.04116440   3.61e-16  1.0e-07 PASS
+rs    se_robust       margins = closed form                  0.08255530     0.08255530   8.33e-17  1.0e-06 PASS
+rs    lin_b           R fit_ols, engine(mata)               -0.03067982    -0.03067982   3.29e-15  1.0e-09 PASS
+rs    lin_se_hc1      R vcov_ols, engine(mata)               0.07185643     0.07185643   2.50e-16  1.0e-09 PASS
+rs    lin_b           R fit_ols, engine(stata) regress      -0.03067982    -0.03067982   7.29e-15  1.0e-09 PASS
+rs    lin_se_hc1      R vcov_ols, engine(stata) regress      0.07185643     0.07185643   1.70e-14  1.0e-09 PASS
+did   est             logit + margins subpop()               0.03754982     0.03754982   1.71e-13  1.0e-05 PASS
+did   se_cluster      logit + margins subpop()               0.06701908     0.06701905   3.36e-08  1.0e-05 PASS
+did   lin_b           regress, vce(cluster)                  0.05248397     0.05248397   3.02e-15  1.0e-09 PASS
+did   lin_se_cluster  regress, vce(cluster)                  0.06166057     0.06166057   6.38e-16  1.0e-09 PASS
+did   lin_b           xtdidregress                           0.05248397     0.05248397   4.23e-16  1.0e-09 PASS
+did   lin_se_cluster  xtdidregress x sqrt((N-3)/(N-5))       0.06166057     0.06166057   4.93e-16  1.0e-09 PASS
+didx  est             logit + margins subpop()               0.09045808     0.09045806   1.90e-08  1.0e-05 PASS
+didx  se_model        logit + margins subpop()               0.05937185     0.05937183   1.25e-08  1.0e-05 PASS
+didx  se_robust       logit vce(robust) x sqrt((N-1)/N)      0.05934543     0.05934540   2.46e-08  1.0e-05 PASS
+didx  lin_b           regress, vce(robust)                   0.10382779     0.10382779   2.98e-15  1.0e-09 PASS
+didx  lin_se_hc1      regress, vce(robust)                   0.05562467     0.05562467   4.65e-16  1.0e-09 PASS
+didx  lin_b           didregress, vce(robust)                0.10382779     0.10382779   2.28e-15  1.0e-09 PASS
+didx  lin_se_hc1      didregress, vce(robust)                0.05562467     0.05562467   7.91e-16  1.0e-09 PASS
+sub   by0             margins over(m)                        0.03185618     0.03185618   3.20e-09  1.0e-05 PASS
+sub   by1             margins over(m)                        0.27659564     0.27659564   7.37e-10  1.0e-05 PASS
+sub   est             margins over(m) + lincom               0.24473945     0.24473946   3.94e-09  1.0e-05 PASS
+sub   se_cluster      margins over(m) + lincom               0.11351771     0.11351766   4.93e-08  1.0e-05 PASS
+sub   lin_b           regress, vce(cluster)                  0.23382601     0.23382601   5.25e-15  1.0e-09 PASS
+sub   lin_se_cluster  regress, vce(cluster)                  0.10772641     0.10772641   1.42e-14  1.0e-09 PASS
+sub   lin_b           didregress, group(d m) (DDD)           0.23382601     0.23382601   1.28e-14  1.0e-09 PASS
+Tier B (difference-in-differences): 225 PASS, 0 FAIL

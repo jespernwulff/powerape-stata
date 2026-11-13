@@ -67,6 +67,8 @@ f ado/powerape_iv.mata
 f ado/powerape_stata_engine.mata
 f ado/powerape_search.mata
 f ado/powerape_cmd.mata
+f ado/powerape_did.mata
+f ado/powerape_did_cmd.mata
 f build.do
 f examples/showcase.do
 e

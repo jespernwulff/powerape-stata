@@ -52,6 +52,7 @@ string scalar pape_fit_lab(struct pape_dgp scalar d, string scalar se,
     string scalar separation, string scalar engine, string scalar effects)
 {
     string scalar cmd, opts
+    if (d.route == "did") return(pape_did_fit_lab(d, se, separation, engine, effects))
     if (engine == "mata") {
         if (d.route == "iv") return("Mata engine (Fisher scoring; control-function probit)")
         return("Mata engine (Fisher scoring)")

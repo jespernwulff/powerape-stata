@@ -1,0 +1,32 @@
+logit, index: cell rate 1 equals R's                           Stata  0.3000000  R  0.3000000  |diff|  0.0e+00  tol  1.0e-10  PASS
+logit, index: cell rate 2 equals R's                           Stata  0.4000000  R  0.4000000  |diff|  0.0e+00  tol  1.0e-10  PASS
+logit, index: cell rate 3 equals R's                           Stata  0.4000000  R  0.4000000  |diff|  0.0e+00  tol  1.0e-10  PASS
+logit, index: cell rate 4 equals R's                           Stata  0.8090909  R  0.8090909  |diff|  0.0e+00  tol  1.0e-10  PASS
+logit, index: exact power, Mata oracle = R oracle              Stata  0.3848479  R  0.3848479  |diff|  5.6e-17  tol  1.0e-09  PASS
+logit, index: exact failed share, Mata oracle = R oracle       Stata  0.0029157  R  0.0029157  |diff|  2.7e-17  tol  1.0e-09  PASS
+logit, index: power, engine(mata), nsim 40000                  exact  0.3848  simulated  0.3835  MCSE 0.0024  |diff| 0.0014  tol 0.0099  PASS
+logit, index: failed share, engine(mata)                       exact  0.0029  simulated  0.0029  MCSE 0.0003  |diff| 0.0000  tol 0.0013  PASS
+logit, index: power, engine(stata), nsim 4000                  exact  0.3848  simulated  0.3965  MCSE 0.0077  |diff| 0.0117  tol 0.0309  PASS
+logit, index: failed share, engine(stata)                      exact  0.0029  simulated  0.0022  MCSE 0.0009  |diff| 0.0007  tol 0.0035  PASS
+probit, index: cell rate 1 equals R's                          Stata  0.3000000  R  0.3000000  |diff|  0.0e+00  tol  1.0e-10  PASS
+probit, index: cell rate 2 equals R's                          Stata  0.4000000  R  0.4000000  |diff|  0.0e+00  tol  1.0e-10  PASS
+probit, index: cell rate 3 equals R's                          Stata  0.4000000  R  0.4000000  |diff|  0.0e+00  tol  1.0e-10  PASS
+probit, index: cell rate 4 equals R's                          Stata  0.8070634  R  0.8070634  |diff|  0.0e+00  tol  1.0e-10  PASS
+probit, index: exact power, Mata oracle = R oracle             Stata  0.3948078  R  0.3948078  |diff|  1.7e-16  tol  1.0e-09  PASS
+probit, index: exact failed share, Mata oracle = R oracle      Stata  0.0027412  R  0.0027412  |diff|  3.6e-17  tol  1.0e-09  PASS
+probit, index: power, engine(mata), nsim 40000                 exact  0.3948  simulated  0.3943  MCSE 0.0024  |diff| 0.0005  tol 0.0100  PASS
+probit, index: failed share, engine(mata)                      exact  0.0027  simulated  0.0026  MCSE 0.0003  |diff| 0.0001  tol 0.0012  PASS
+probit, index: power, engine(stata), nsim 4000                 exact  0.3948  simulated  0.3957  MCSE 0.0077  |diff| 0.0009  tol 0.0310  PASS
+probit, index: failed share, engine(stata)                     exact  0.0027  simulated  0.0018  MCSE 0.0008  |diff| 0.0010  tol 0.0034  PASS
+logit, linear: cell rate 1 equals R's                          Stata  0.3000000  R  0.3000000  |diff|  0.0e+00  tol  1.0e-10  PASS
+logit, linear: cell rate 2 equals R's                          Stata  0.4000000  R  0.4000000  |diff|  0.0e+00  tol  1.0e-10  PASS
+logit, linear: cell rate 3 equals R's                          Stata  0.4000000  R  0.4000000  |diff|  0.0e+00  tol  1.0e-10  PASS
+logit, linear: cell rate 4 equals R's                          Stata  0.8000000  R  0.8000000  |diff|  0.0e+00  tol  1.0e-10  PASS
+logit, linear: exact power, Mata oracle = R oracle             Stata  0.4231303  R  0.4231303  |diff|  1.7e-16  tol  1.0e-09  PASS
+logit, linear: exact failed share, Mata oracle = R oracle      Stata  0.0000000  R  0.0000000  |diff|  1.7e-35  tol  1.0e-09  PASS
+logit, linear: power, engine(mata), nsim 40000                 exact  0.4231  simulated  0.4246  MCSE 0.0025  |diff| 0.0015  tol 0.0101  PASS
+logit, linear: failed share, engine(mata)                      exact  0.0000  simulated  0.0000  MCSE 0.0000  |diff| 0.0000  tol 0.0003  PASS
+logit, linear: power, engine(stata), nsim 4000                 exact  0.4231  simulated  0.4275  MCSE 0.0078  |diff| 0.0044  tol 0.0314  PASS
+logit, linear: failed share, engine(stata)                     exact  0.0000  simulated  0.0000  MCSE 0.0002  |diff| 0.0000  tol 0.0007  PASS
+logit, index: power, engine(stata) effects(margins), nsim 1500 exact  0.3848  simulated  0.3713  MCSE 0.0126  |diff| 0.0135  tol 0.0504  PASS
+Tier A (difference-in-differences): 31 PASS, 0 FAIL

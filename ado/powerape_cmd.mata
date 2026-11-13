@@ -183,6 +183,7 @@ void pape_dgp_rreturn(struct pape_dgp scalar d)
     pape_rnum("p1", d.p1)
     pape_rnum("k", d.k)
     st_matrix("pape_r_gamma", d.gamma')
+    if (d.route == "did") pape_did_rreturn(d)
 }
 
 // ---------------------------------------------------------------------------
@@ -316,6 +317,17 @@ void pape_res_rreturn(struct pape_res scalar r, string scalar resname)
     pape_rnum("nsim_confirm", r.nsim_confirm)
     pape_rnum("mde", r.mde)
     pape_rnum("is_margin", r.is_margin)
+    if (r.dgp.route == "did") {
+        // difference-in-differences designs: the analysis, whether it is valid
+        // in the simulated world, and (power results) where the estimates centre
+        pape_rstr("analysis", r.dgp.analysis)
+        pape_rstr("trends", r.dgp.trends)
+        pape_rnum("valid", pape_did_valid(r.dgp))
+        if (r.kind == "power") {
+            pape_rnum("est_mean", r.est_mean)
+            pape_rnum("est_mcse", r.est_mcse)
+        }
+    }
     if (cols(r.outcomes) > 0) {
         st_matrix("pape_r_outcomes", r.outcomes)
         st_matrixcolstripe("pape_r_outcomes", (J(cols(r.outcomes), 1, ""), r.outnames'))
@@ -331,6 +343,9 @@ void pape_res_rreturn(struct pape_res scalar r, string scalar resname)
     else pape_rstr("has_history", "0")
     if (rows(r.results) > 0) {
         st_matrix("pape_r_results", r.results)
+        if (cols(r.results) == 8)
+            st_matrixcolstripe("pape_r_results", (J(8, 1, ""), ("n" \ "alpha" \ "power" \ "mcse" \ "failed" \ "separated" \ "min_cell" \ "est_mean")))
+        else
         st_matrixcolstripe("pape_r_results", (J(7, 1, ""), ("n" \ "alpha" \ "power" \ "mcse" \ "failed" \ "separated" \ "min_cell")))
         pape_rstr("has_results", "1")
     }
@@ -350,7 +365,7 @@ void pape_cmd_power(string scalar dname, real scalar n, string scalar claim,
     struct pape_res scalar r
     d = pape_get_dgp(dname)
     r = pape_power_once(d, n, claim, sesoi, conf, nsim, seed, 1, se, alpha, rule, keep_draws, separation)
-    (void) pape_sparse_warning(r.separated, r.min_cell, separation, "", r.estimand == "aie")
+    (void) pape_sparse_warning(r.separated, r.min_cell, separation, "", pape_cell_code(d, r.estimand == "aie"))
     pape_store_put("RES", resname, r)
     if (display) pape_print_power(r)
     pape_res_rreturn(r, resname)
@@ -464,6 +479,7 @@ void pape_cmd_powerat(string scalar resname, string scalar alphas)
     string colvector nm
     x = pape_get_res(resname)
     if (x.kind != "power") pape_err("powerape powerat needs a powerape power result.")
+    pape_did_power_only(x.dgp, "powerape powerat")
     if (!x.has_draws) pape_err("The result carries no stored draws; rerun powerape power without nodraws.")
     a = pape_num_col(alphas)
     if (rows(a) == 0 | any(a :<= 0) | any(a :>= 0.5)) pape_err("alpha() values must lie in (0, 0.5).")
@@ -559,6 +575,13 @@ void pape_cmd_robust(string scalar dname, real scalar n, string scalar claim,
     real colvector nl
     real matrix L
     dgp = pape_get_dgp(dname)
+    if (dgp.route == "did") {
+        // difference-in-differences designs: own sweep (powerape_did_cmd.mata)
+        pape_cmd_robust_did(dname, n, claim, sesoi, alpha, conf, rule, nsim, seed, varynames,
+            varyvals, pin, mode, power, grid_points, nmax, nmax_power, se, direction,
+            separation, resname, display)
+        return
+    }
     se_use = se
     if (se != "model" & (dgp.route == "panel" | dgp.route == "iv")) {
         printf("{err}warning: se() is fixed by the route; se(%s) is ignored.\n", se)

@@ -21,6 +21,10 @@ struct pape_xdraw {
     real colvector id, pr, start, y, d, m
     real matrix Zx, X1
     real scalar has_id, has_start
+    // difference-in-differences draws: after-block and subgroup indicators,
+    // the treatment indicator's column (focal_col is the estimand's column)
+    real colvector post, sub
+    real scalar w_col
 }
 
 struct pape_sim {
@@ -47,6 +51,9 @@ struct pape_res {
     real matrix history
     // curve
     real matrix results
+    // difference-in-differences designs only (never read for other routes):
+    // mean of the usable estimates and its Monte Carlo standard error
+    real scalar est_mean, est_mcse
 }
 
 struct pape_pdraw {

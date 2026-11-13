@@ -16,7 +16,7 @@ clear all
 local here "`c(pwd)'"
 local root "`here'"
 local sources powerape_core powerape_structs powerape_engine powerape_panel powerape_iv ///
-    powerape_stata_engine powerape_search powerape_cmd
+    powerape_stata_engine powerape_search powerape_cmd powerape_did powerape_did_cmd
 capture confirm file "`root'/ado/powerape_core.mata"
 if !_rc {
     local src "`root'/ado"

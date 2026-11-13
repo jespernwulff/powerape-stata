@@ -320,6 +320,287 @@ powerape robust e1, n(1500) claim(detect) vary(baseline(0.2 0.4) signal(0 0.3)) 
 mata: S = st_matrix("r(scenarios)"); st_local("allfeas", strofreal(all(S[., cols(S)] :== 1) & rows(S) == 9))
 check (`allfeas') "sweep on an empirical DGP recalibrates from the stored rows"
 
+* ---- 9. difference-in-differences designs -------------------------------------
+clear
+* design, pin, readings (closed forms without covariates)
+powerape dgp k1, did model(logit) baseline(0.20) gap(0.20) trend(0.10) rho(0.4) nodisplay
+check ("`r(route)'" == "did" & "`r(design)'" == "panel" & "`r(trends)'" == "index" & "`r(analysis)'" == "index") "did: route, design, trends and analysis are returned"
+local cf = invlogit(logit(0.40) + logit(0.30) - logit(0.20))
+check (abs(el(r(rates), 1, 4) - `cf') < 1e-12) "did: index world, the untreated rate follows the control group on the logit index"
+powerape setatt k1, target(0.07) nodisplay
+check (abs(r(target) - 0.07) < 1e-12 & abs(el(r(rates), 1, 5) - (`cf' + 0.07)) < 1e-12 & "`r(estimand)'" == "att") "did: setatt pins the effect on the treated"
+check (abs(r(reading_index) - 0.07) < 1e-10 & abs(r(reading_linear) - (`cf' + 0.07 - 0.50)) < 1e-12) "did: both readings of the four rates"
+powerape trueatt k1
+check (abs(r(att) - 0.07) < 1e-9) "did: true ATT equals the target"
+powerape dgp k1l, did model(logit) baseline(0.20) gap(0.20) trend(0.10) trends(linear) analysis(linear) nodisplay
+powerape setatt k1l, target(0.10) nodisplay
+check (abs(el(r(rates), 1, 4) - 0.50) < 1e-12 & abs(r(reading_linear) - 0.10) < 1e-12) "did: linear world, the untreated rate follows the control group in probabilities"
+check (abs(r(reading_index) - (0.60 - `cf')) < 1e-10 & abs(r(reading_index) - 0.0667) < 5e-4) "did: rates .20/.30/.40/.60 read on the logit index: .067"
+powerape dgp k1p, did model(probit) baseline(0.20) gap(0.20) trend(0.10) trends(linear) nodisplay
+powerape setatt k1p, target(0.10) nodisplay
+check (abs(r(reading_index) - (0.60 - normal(invnormal(0.40) + invnormal(0.30) - invnormal(0.20)))) < 1e-10 & abs(r(reading_index) - 0.074) < 1e-3) "did: the same rates read on the probit index: .074"
+* without a baseline gap, or without a change in the control group, the two readings coincide
+foreach lk in probit logit {
+    powerape dgp kz, did model(`lk') baseline(0.20) gap(0) trend(0.10) trends(linear) design(cross-sections) nodisplay replace
+    powerape setatt kz, target(0.10) nodisplay
+    check (abs(r(reading_index) - 0.10) < 1e-10 & abs(r(reading_linear) - 0.10) < 1e-10) "did: no baseline gap, the readings coincide (`lk')"
+    powerape dgp kz, did model(`lk') baseline(0.20) gap(0.20) trend(0) trends(linear) design(cross-sections) nodisplay replace
+    powerape setatt kz, target(0.10) nodisplay
+    check (abs(r(reading_index) - 0.10) < 1e-10 & abs(r(reading_linear) - 0.10) < 1e-10) "did: no control-group change, the readings coincide (`lk')"
+}
+* refusals of the builder and the pins
+capture noisily powerape dgp bad, did baseline(0.90) gap(0.20)
+check (_rc == 498) "did: baseline + gap outside (0, 1) is refused"
+capture noisily powerape dgp bad, did baseline(0.60) gap(0.30) trend(0.20) trends(linear)
+check (_rc == 498) "did: linear trends that leave (0, 1) are refused"
+capture noisily powerape dgp bad, did baseline(0.30 0.20)
+check (_rc == 498) "did: two baselines need subgroup()"
+capture noisily powerape dgp bad, did baseline(0.30) design(wide)
+check (_rc == 498) "did: unknown design() is refused"
+capture noisily powerape dgp bad, did baseline(0.30) focal(t, binary p(0.5))
+check (_rc == 198) "did: focal() is refused"
+capture noisily powerape setatt k1, target(0.60)
+check (_rc == 498) "did: infeasible ATT is refused"
+capture noisily powerape setatt k1, target(0.05 0.02)
+check (_rc == 498) "did: two targets need a subgroup design"
+capture noisily powerape setatt t0, target(0.05)
+check (_rc == 498) "setatt is refused for a design that is not difference-in-differences"
+capture noisily powerape setape k1, target(0.05)
+check (_rc == 498) "setape is refused for a difference-in-differences design"
+capture noisily powerape trueape k1
+check (_rc == 498) "trueape is refused for a difference-in-differences design"
+powerape dgp k0, did model(logit) baseline(0.20) gap(0.20) trend(0.10) nodisplay
+capture noisily powerape power k0, n(500) claim(detect) nsim(20)
+check (_rc == 498) "did: power needs a pinned effect"
+* several periods and covariates: the coefficient vector and the pin
+powerape dgp k3, did model(probit) baseline(0.25) gap(0.10) trend(0.08) design(cross-sections) npre(2) npost(3) ///
+    covariates((z, normal)) signal(0.2) nint(50000) nodisplay
+powerape setatt k3, target(0.08) nodisplay
+mata: bt = pape_did_beta(pape_get_dgp("k3")); st_local("okb", strofreal(rows(bt) == 8 & bt[3] == 0 & bt[4] == bt[5] & bt[5] == bt[6]))
+check (`okb') "did: 2 + 3 periods, coefficients 0 on the pre-period dummy and equal on the post-period dummies"
+check (abs(r(p_post) - 0.6) < 1e-12 & r(n_pre) == 2 & r(n_post) == 3) "did: the default share after treatment is n_post / periods"
+powerape trueatt k3
+check (abs(r(att) - 0.08) < 1e-7) "did: true ATT with covariates equals the target"
+* a binary subgroup
+powerape dgp ks, did model(logit) baseline(0.30 0.20) gap(0.10 0.15) trend(0.10 0.05) rho(0.5) subgroup(female, p(0.4)) nodisplay
+capture noisily powerape setatt ks, target(0.05)
+check (_rc == 498) "did: a subgroup design needs the two effects"
+powerape setatt ks, target(0.10 0.03) nodisplay
+check (abs(r(target) + 0.07) < 1e-12 & "`r(estimand)'" == "datt" & abs(r(att_ref) - 0.10) < 1e-12 & abs(r(att_sub) - 0.03) < 1e-12) "did: the subgroup estimand is the difference of the two effects"
+powerape trueatt ks
+check (abs(r(att) + 0.07) < 1e-9 & abs(r(att_ref) - 0.10) < 1e-9 & abs(r(att_sub) - 0.03) < 1e-9) "did: true subgroup effects and their difference"
+mata: st_local("okb", strofreal(rows(pape_did_beta(pape_get_dgp("ks"))) == 8))
+check (`okb') "did: the subgroup design matrix has eight columns with two periods"
+
+* the saturated identities on one fixed study (both links, both analyses, both engines)
+clear
+set seed 31
+set obs 1200
+generate double d = runiform() < 0.5
+generate double post = runiform() < 0.5
+generate double w = d * post
+generate double y = runiform() < invlogit(-1 + 0.5 * d + 0.4 * post + 0.6 * w)
+forvalues a = 0/1 {
+    forvalues b = 0/1 {
+        quietly summarize y if d == `a' & post == `b'
+        local m`a'`b' = r(mean)
+    }
+}
+mata: X = (J(st_nobs(), 1, 1), st_data(., ("d", "post", "w"))); y = st_data(., "y")
+mata: est = .; se = .; b = .; jac = .; by = .
+foreach lk in logit probit {
+    local sat = cond("`lk'" == "logit", `m11' - invlogit(logit(`m10') + logit(`m01') - logit(`m00')), ///
+        `m11' - normal(invnormal(`m10') + invnormal(`m01') - invnormal(`m00')))
+    mata: ok = pape_did_analyze(X, y, J(0, 1, .), J(0, 1, .), "`lk'", 2, "index", "model", "mata", "closed", est, se, b, jac, by)
+    mata: st_local("okb", strofreal(ok & abs(est - `sat') < 1e-7))
+    check (`okb') "did: saturated identity of the ATT estimate, `lk', engine(mata)"
+    mata: e_m = est; s_m = se
+    mata: ok = pape_did_analyze(X, y, J(0, 1, .), J(0, 1, .), "`lk'", 2, "index", "model", "stata", "closed", est, se, b, jac, by)
+    mata: st_local("okb", strofreal(ok & abs(est - `sat') < 1e-6 & abs(se / s_m - 1) < 1e-5))
+    check (`okb') "did: saturated design, `lk': Stata's fit gives the same estimate and SE"
+    mata: ok = pape_did_analyze(X, y, J(0, 1, .), J(0, 1, .), "`lk'", 2, "index", "model", "stata", "margins", est, se, b, jac, by)
+    mata: st_local("okb", strofreal(ok & abs(est - `sat') < 1e-6 & abs(se / s_m - 1) < 1e-5))
+    check (`okb') "did: saturated design, `lk': margins, dydx() subpop() gives the same estimate and SE"
+}
+local cd = `m11' - `m10' - `m01' + `m00'
+mata: ok = pape_did_analyze(X, y, J(0, 1, .), J(0, 1, .), "logit", 2, "linear", "model", "mata", "closed", est, se, b, jac, by)
+mata: st_local("okb", strofreal(ok & abs(est - `cd') < 1e-12))
+check (`okb') "did: the linear analysis is the cross difference of the four cell means"
+quietly regress y d post w, vce(robust)
+scalar sb = _b[w]
+scalar sse = _se[w]
+mata: st_local("okb", strofreal(abs(est - st_numscalar("sb")) < 1e-12 & abs(se - st_numscalar("sse")) < 1e-12))
+check (`okb') "did: OLS coefficient and HC1 standard error equal regress, vce(robust)"
+clear
+
+* both engines on one seed (the same draws, the same decisions for logit and OLS)
+powerape power k1, n(1200) claim(detect) nsim(60) seed(41) engine(mata) nodisplay
+scalar pm = r(power)
+check ("`r(fit)'" == "Mata engine (Fisher scoring)" & r(valid) == 1 & "`r(estimand)'" == "att") "did: r(fit), r(valid) and r(estimand) under engine(mata)"
+check (abs(r(est_mean) - 0.07) < 0.02 & r(est_mcse) < 0.01) "did: r(est_mean) and r(est_mcse) are returned"
+powerape power k1, n(1200) claim(detect) nsim(60) seed(41) engine(stata) nodisplay
+check (r(power) == scalar(pm) & "`r(fit)'" == "logit, vce(cluster) via engine(stata), effects(closed)") "did: logit, vce(cluster) in the loop gives the same power on the same seed"
+powerape power k1, n(1200) claim(detect) nsim(60) seed(41) engine(stata) effects(margins) nodisplay
+check (r(power) == scalar(pm) & "`r(fit)'" == "logit, vce(cluster) via engine(stata), effects(margins)") "did: margins in the loop gives the same power on the same seed"
+powerape power k1l, n(1200) claim(detect) nsim(60) seed(42) engine(mata) nodisplay
+scalar pm = r(power)
+check ("`r(fit)'" == "Mata engine (OLS)" & "`r(analysis)'" == "linear") "did: linear analysis under engine(mata)"
+powerape power k1l, n(1200) claim(detect) nsim(60) seed(42) engine(stata) nodisplay
+check (r(power) == scalar(pm) & "`r(fit)'" == "regress, vce(cluster) via engine(stata)") "did: regress, vce(cluster) in the loop gives the same power on the same seed"
+powerape power k3, n(1500) claim(detect) nsim(40) seed(43) se(robust) engine(stata) nodisplay
+check ("`r(fit)'" == "probit, vce(robust) via engine(stata), effects(closed)" & "`r(se)'" == "robust") "did: cross-sections accept se(robust)"
+powerape power k1, n(1200) claim(detect) nsim(40) seed(44) se(robust) engine(mata) nodisplay
+check ("`r(se)'" == "model") "did: se() is fixed in a panel (unit-clustered)"
+powerape power ks, n(2500) claim(detect) nsim(40) seed(45) engine(mata) nodisplay
+scalar pm = r(power)
+check ("`r(estimand)'" == "datt" & r(target) < 0) "did: subgroup design runs, estimand datt"
+powerape power ks, n(2500) claim(detect) nsim(40) seed(45) engine(stata) nodisplay
+scalar ps = r(power)
+powerape power ks, n(2500) claim(detect) nsim(40) seed(45) engine(stata) effects(margins) nodisplay
+check (scalar(ps) == scalar(pm) & r(power) == scalar(pm)) "did: subgroup design, three ways of fitting agree on one seed"
+* an old route returns none of the new results
+powerape power t0, n(300) claim(detect) nsim(30) seed(46) engine(mata) nodisplay
+check ("`r(est_mean)'" == "" & "`r(analysis)'" == "" & "`r(valid)'" == "") "a standard design returns no difference-in-differences results"
+
+* an analysis that assumes another scale than the world has
+powerape dgp km, did model(logit) baseline(0.20) gap(0.20) trend(0.10) rho(0.4) trends(linear) analysis(index) nodisplay
+powerape setatt km, target(0.10) nodisplay
+powerape power km, n(1500) claim(detect) nsim(200) seed(47) engine(mata) nodisplay
+check (r(valid) == 0 & abs(r(est_mean) - 0.0667) < 0.012 & r(est_mean) < 0.09) "did: logit analysis in a linear world centres on the index reading (.067), not on the ATT (.100)"
+capture noisily powerape n km, power(0.8) claim(detect) nsim(50)
+check (_rc == 498) "did: n refuses an analysis that is not valid in the simulated world"
+capture noisily powerape mde km, n(1500) claim(detect) nsim(50)
+check (_rc == 498) "did: mde refuses it too"
+capture noisily powerape powerat, alpha(0.01)
+check (_rc == 498) "did: powerat refuses a rejection rate"
+capture noisily powerape alpha
+check (_rc == 498) "did: alpha refuses a rejection rate"
+capture noisily powerape statement
+check (_rc == 498) "did: statement refuses a rejection rate"
+capture noisily powerape robust km, n(1500) claim(detect) vary(rho(0.2 0.6))
+check (_rc == 498) "did: robust refuses a base design whose analysis is not valid"
+powerape power k1l, n(900) claim(detect) nsim(300) seed(48) engine(mata) nodisplay
+check (abs(r(est_mean) - 0.10) < 4 * r(est_mcse) + 0.002) "did: the linear analysis centres on the ATT in a linear world"
+
+* curve, n, mde
+powerape curve k1, n(800 1500) claim(detect) nsim(60) seed(49) engine(mata) nodisplay
+check (colsof(r(results)) == 8 & el(r(results), 2, 3) >= el(r(results), 1, 3) - 0.15) "did: the curve carries the mean estimate in column 8"
+powerape curve t0, n(300 500) claim(detect) nsim(40) seed(49) engine(mata) nodisplay
+check (colsof(r(results)) == 7) "a standard design's curve keeps seven columns"
+powerape n k1l, power(0.8) claim(detect) nsim(200) seed(50) engine(mata) noconfirm nodisplay
+check (r(n) > 800 & r(n) < 2200 & "`r(kind)'" == "n") "did: required number of units, linear analysis (closed form about 1,350)"
+powerape mde k1, n(1500) claim(detect) nsim(200) seed(51) engine(mata) noconfirm nodisplay
+check (r(mde) > 0.07 & r(mde) < 0.13 & "`r(estimand)'" == "att") "did: minimum detectable ATT"
+powerape mde ks, n(2500) claim(detect) nsim(100) seed(52) engine(mata) noconfirm nodisplay
+check (r(mde) < 0 & "`r(estimand)'" == "datt") "did: the MDE of a subgroup design is the difference, in the pinned direction"
+powerape dgp ks0, did model(logit) baseline(0.30 0.20) gap(0.10 0.15) trend(0.10 0.05) rho(0.5) subgroup(female, p(0.4)) nodisplay
+capture noisily powerape mde ks0, n(2500) claim(detect) nsim(50)
+check (_rc == 498) "did: the MDE of a subgroup design needs the reference effect pinned"
+
+* robustness sweep
+powerape robust k1, n(1200) claim(detect) vary(rho(0.2 0.6)) nsim(60) seed(1) nonmax engine(mata) nodisplay
+matrix S = r(scenarios)
+check (rowsof(S) == 3 & colsof(S) == 6 & abs(S[1, 2] - 0.07) < 1e-12 & abs(S[3, 2] - 0.07) < 1e-12) "did: sweep over rho re-pins the effect in every scenario"
+powerape power k1, n(1200) claim(detect) nsim(60) seed(3) engine(mata) nodisplay
+check (r(power) == S[2, 3]) "did: the middle scenario equals a direct run at its seed"
+powerape robust k1, n(1200) claim(detect) vary(baseline(0.15 0.35) gap(0 0.2) trend(0.04 0.12) ptreated(0.3 0.5)) ///
+    gridpoints(2) nsim(30) seed(2) nonmax engine(mata) nodisplay
+mata: S = st_matrix("r(scenarios)"); st_local("okb", strofreal(rows(S) == 16 & all(S[., cols(S)] :== 1)))
+check (`okb') "did: baseline, gap, trend and the treated share can be varied"
+powerape dgp kx, did model(logit) baseline(0.25) gap(0.10) trend(0.08) design(cross-sections) nodisplay
+powerape setatt kx, target(0.07) nodisplay
+capture noisily powerape robust kx, n(1200) claim(detect) vary(rho(0.2 0.6))
+check (_rc == 498) "did: rho cannot be varied in cross-sections"
+capture noisily powerape robust k1, n(1200) claim(detect) vary(rho(0.2 0.6)) pin(coefficients)
+check (_rc == 498) "did: pin(coefficients) is refused"
+capture noisily powerape robust ks, n(2500) claim(detect) vary(baseline(0.2 0.3))
+check (_rc == 498) "did: baseline cannot be varied in a subgroup design"
+capture noisily powerape robust k1, n(1200) claim(detect) vary(trends(index probit))
+check (_rc == 498) "did: vary(trends()) takes index and linear"
+powerape robust k1, n(1500) claim(detect) vary(trends(index linear)) nsim(150) seed(2) nmaxpower(0.8) engine(mata) nodisplay
+matrix S = r(scenarios)
+check (colsof(S) == 8 & S[1, 1] == 1 & S[2, 1] == 2 & S[1, 8] == 1 & S[2, 8] == 0) "did: a sweep over trends flags the scenario the analysis is biased in"
+check (abs(S[1, 2] - 0.07) < 1e-12 & abs(S[2, 2] - 0.07) < 1e-12 & S[2, 7] < S[1, 7]) "did: the effect is held and the biased scenario centres lower"
+check (r(worst) == 1 & r(nmax_scenario) == 1 & r(nmax) > 1500) "did: the biased scenario is shown but never ranked"
+powerape robust k1, n(1500) claim(detect) vary(baseline(0.15 0.35)) mode(mde) gridpoints(2) nsim(80) seed(3) engine(mata) nodisplay
+mata: S = st_matrix("r(scenarios)"); st_local("okb", strofreal(all(S[., 2] :> 0.04) & all(S[., 2] :< 0.2)))
+check (`okb') "did: MDE mode of the sweep"
+powerape robust ks, n(2500) claim(detect) vary(rho(0.3 0.7)) gridpoints(2) nsim(40) seed(4) nonmax engine(mata) nodisplay
+mata: S = st_matrix("r(scenarios)"); st_local("okb", strofreal(all(abs(S[., 2] :+ 0.07) :< 1e-12)))
+check (`okb') "did: sweep on a subgroup design holds both effects"
+powerape robust k1l, n(900) claim(detect) vary(gap(0 0.2)) gridpoints(2) nsim(40) seed(5) nonmax engine(mata) nodisplay
+check ("`r(analysis)'" == "linear" & "`r(fit)'" == "Mata engine (OLS)") "did: the sweep carries the linear analysis into every scenario"
+
+* justified alpha and the methods paragraph
+powerape power k1, n(1500) claim(minimum) sesoi(0.02) nsim(300) seed(5) engine(mata) nodisplay
+local pw = r(power)
+powerape powerat, alpha(0.01 0.05)
+check (abs(el(r(table), 2, 3) - `pw') < 1e-12 & el(r(table), 1, 3) <= el(r(table), 2, 3)) "did: powerat re-reads the stored draws"
+powerape alpha, cost(4) size nsimsize(300) seed(6) engine(mata) nodisplay
+check (abs(r(size_truth) - 0.02) < 1e-12 & abs(r(size) - r(alpha)) < 4 * r(size_mcse) + 0.01) "did: the realized size is measured in the boundary world (true ATT = sesoi)"
+powerape statement _last
+local st `"`r(statement)'"'
+check (strpos(`"`st'"', "average treatment effect on the treated (ATT) in a difference-in-differences design") > 0) "did statement: names the estimand"
+check (strpos(`"`st'"', "a treated group (50% of the units) and a control group") > 0 & strpos(`"`st'"', "observed in one period before and one period after one common treatment date") > 0) "did statement: groups and periods"
+check (strpos(`"`st'"', "as a panel of the same units, with a latent within-unit correlation of 0.40") > 0) "did statement: data structure"
+check (strpos(`"`st'"', "untreated trends parallel on the logit index") > 0 & strpos(`"`st'"', "The assumed true ATT was 0.070 (7.0 percentage points).") > 0) "did statement: scale of the trends and the effect"
+check (strpos(`"`st'"', "n = 1500 units observed in 2 periods (3,000 unit-period observations)") > 0) "did statement: sample size"
+check (strpos(`"`st'"', "a pooled logit regression of the outcome on group, period indicators and the treatment indicator") > 0 & strpos(`"`st'"', "unit-clustered standard errors") > 0) "did statement: the analysis"
+check (strpos(`"`st'"', "a group-by-before/after cell with no events or no non-events") > 0 & strpos(`"`st'"', "focal") == 0) "did statement: separation named by its cells, no focal variable"
+powerape statement _lastalpha
+check (strpos(`"`r(statement)'"', "the planning value (ATT = 0.070)") > 0 & strpos(`"`r(statement)'"', "Each simulated study was analysed by a pooled logit regression") > 0 & strpos(`"`r(statement)'"', "At n = 1500 units the optimum") > 0) "did: the justification paragraph names the estimand and the analysis"
+powerape dgp kxl, did model(probit) baseline(0.20) gap(0.20) trend(0.10) design(cross-sections) npre(2) npost(3) ///
+    trends(linear) analysis(linear) nodisplay
+powerape setatt kxl, target(0.08) nodisplay
+powerape power kxl, n(2000) claim(detect) nsim(60) seed(7) engine(mata) nodisplay
+powerape statement
+local st `"`r(statement)'"'
+check (strpos(`"`st'"', "observed in 2 periods before and 3 periods after") > 0 & strpos(`"`st'"', "as repeated cross-sections, with 60% of the observations after the treatment date") > 0) "did statement: several periods, cross-sections"
+check (strpos(`"`st'"', "untreated trends parallel in probabilities") > 0 & strpos(`"`st'"', "n = 2000 observations") > 0) "did statement: linear world"
+check (strpos(`"`st'"', "ordinary least squares of the outcome on group, period indicators and the treatment indicator (a linear probability model)") > 0 & strpos(`"`st'"', "heteroskedasticity-robust (HC1) standard errors") > 0) "did statement: the linear analysis"
+check (strpos(`"`st'"', "maximum-likelihood") == 0 & strpos(`"`st'"', "separation") == 0) "did statement: no separation language for OLS"
+powerape power ks, n(2500) claim(detect) nsim(40) seed(8) engine(mata) nodisplay
+powerape statement
+local st `"`r(statement)'"'
+check (strpos(`"`st'"', "difference between two subgroups' average treatment effects on the treated (by female)") > 0 & strpos(`"`st'"', "were 0.100 (female = 0) and 0.030 (female = 1), a true difference of -0.070") > 0) "did statement: subgroup difference"
+check (strpos(`"`st'"', "fully interacted with female") > 0 & strpos(`"`st'"', "within a subgroup") > 0) "did statement: the interacted analysis"
+powerape power t0, n(300) claim(detect) nsim(40) seed(9) engine(mata) nodisplay
+powerape statement
+check (strpos(`"`r(statement)'"', "average partial effect (APE) of t") > 0 & strpos(`"`r(statement)'"', "difference-in-differences") == 0) "a standard design keeps its paragraph"
+
+* a design from pre-treatment pilot data (20,000 units drawn from the route's copula)
+clear
+set seed 61
+set obs 20000
+generate long firm = _n
+generate double a = rnormal()
+generate byte treated = runiform() < 0.4
+expand 2
+bysort firm: generate byte year = _n
+generate double p = cond(treated, 0.34, 0.22)
+generate byte y = runiform() < normal((invnormal(p) - sqrt(0.35) * a) / sqrt(1 - 0.35))
+powerape dgp kp, didpilot outcome(y) group(treated) id(firm) period(year) trend(0.05) model(logit) nodisplay
+matrix PL = r(pilot)
+check (abs(r(baseline) - 0.22) < 0.01 & abs(el(r(rates), 1, 3) - 0.34) < 0.012 & abs(r(p_treated) - 0.40) < 0.012) "didpilot: recovers the rates and the treated share"
+check (abs(r(rho) - 0.35) < 0.04 & "`r(design)'" == "panel" & PL[1, 4] == 20000) "didpilot: recovers the latent within-unit correlation"
+check (abs(el(r(rates), 1, 2) - (r(baseline) + 0.05)) < 1e-12) "didpilot: trend() is the control group's change"
+powerape setatt kp, target(0.06) nodisplay
+powerape robust kp, n(1500) claim(detect) vary(rho(0.2 0.5)) gridpoints(2) nsim(30) seed(10) nonmax engine(mata) nodisplay
+mata: S = st_matrix("r(scenarios)"); st_local("okb", strofreal(all(S[., cols(S)] :== 1)))
+check (`okb') "didpilot: a pilot-built design can be swept"
+capture noisily powerape dgp kp2, didpilot outcome(y) group(treated) id(firm) period(year)
+check (_rc == 498) "didpilot: trend() is required"
+powerape dgp kp3, didpilot outcome(y) group(treated) trend(0.05) baseline(0.25) nodisplay
+check ("`r(design)'" == "cross-sections" & abs(r(baseline) - 0.25) < 1e-12 & r(rho) == 0) "didpilot: no id() gives cross-sections; a named input overrides the estimate"
+capture noisily powerape dgp kp4, didpilot outcome(y) group(treated) id(firm) trend(0.05) subgroup(female, p(0.4))
+check (_rc == 198) "didpilot: subgroup designs are refused"
+quietly keep if year == 1
+capture noisily powerape dgp kp5, didpilot outcome(y) group(treated) id(firm) trend(0.05)
+check (_rc == 498) "didpilot: one period per unit needs rho()"
+powerape dgp kp5, didpilot outcome(y) group(treated) id(firm) trend(0.05) rho(0.3) nodisplay
+check (abs(r(rho) - 0.3) < 1e-12) "didpilot: rho() supplied for a one-period pilot"
+clear
+
 powerape drop _all
 di as txt _n "run-tests: $PAPE_NPASS PASS, $PAPE_NFAIL FAIL"
 if $PAPE_NFAIL > 0 {

@@ -23,13 +23,15 @@ struct pape_res scalar pape_curve(struct pape_dgp scalar d, real colvector n,
     if (rows(n) < 2 | any(n :< 20)) pape_err("n() needs at least two sample sizes, all >= 20.")
     lv1 = pape_claim_levels(claim, alpha, conf, n[1], rule)
     pape_check_coherence(d, claim, sesoi, lv1[4])
-    r.results = J(rows(n), 7, .)
+    // difference-in-differences designs carry the mean estimate in column 8
+    r.results = J(rows(n), (d.route == "did" ? 8 : 7), .)
     sparse_at = J(0, 1, .)
     first = 0
     for (i = 1; i <= rows(n); i++) {
         si = (seed == . ? . : seed + i - 1)
         p = pape_power_once(d, n[i], claim, sesoi, conf, nsim, si, 0, se, alpha, rule, 0, separation)
-        r.results[i, .] = (n[i], p.alpha, p.power, p.mcse, p.outcomes[cols(p.outcomes)], p.separated, p.min_cell)
+        r.results[i, 1..7] = (n[i], p.alpha, p.power, p.mcse, p.outcomes[cols(p.outcomes)], p.separated, p.min_cell)
+        if (d.route == "did") r.results[i, 8] = p.est_mean
         if ((p.separated != . & p.separated > 0.01) | (p.min_cell != . & p.min_cell < 10)) {
             sparse_at = sparse_at \ n[i]
             if (first == 0) first = i
@@ -37,7 +39,7 @@ struct pape_res scalar pape_curve(struct pape_dgp scalar d, real colvector n,
     }
     if (rows(sparse_at) > 0) {
         where = "At n = " + invtokens(strofreal(sparse_at', "%12.0g"), ", ")
-        (void) pape_sparse_warning(r.results[first, 6], r.results[first, 7], separation, where, d.estimand == "aie")
+        (void) pape_sparse_warning(r.results[first, 6], r.results[first, 7], separation, where, pape_cell_code(d, d.estimand == "aie"))
     }
     r.kind = "curve"
     r.claim = claim; r.sesoi = sesoi
@@ -67,6 +69,21 @@ void pape_print_curve(struct pape_res scalar x)
         x.claim, x.model, strupper(x.estimand), x.nsim,
         (x.has_rule ? "; alpha by sample-size rule (column alpha)" : ""))
     printf("  fit: %s\n", x.fit)
+    if (x.dgp.route == "did") {
+        // these designs also show the mean of the estimates at every n
+        if (pape_did_linear(x.dgp))
+            printf("  analysis: %s%s\n", pape_model_label(x.dgp), pape_did_se_label(x.dgp))
+        if (!pape_did_valid(x.dgp)) {
+            printf("  %s:\n", pape_did_mismatch_text(x.dgp))
+            printf("  column power is a rejection rate, est_mean the mean estimate (true %s %s)\n",
+                strupper(x.estimand), pape_fsgn(x.target))
+        }
+        printf("\n{txt}%10s %9s %8s %8s %8s %10s %9s\n", "n", "alpha", "power", "mcse", "failed", "separated", "est_mean")
+        for (i = 1; i <= rows(x.results); i++)
+            printf("{res}%10.0f %9.4f %8.4f %8.4f %8.4f %10.4f %9.4f\n",
+                x.results[i, 1], x.results[i, 2], x.results[i, 3], x.results[i, 4], x.results[i, 5], x.results[i, 6], x.results[i, 8])
+        return
+    }
     printf("\n{txt}%10s %9s %8s %8s %8s %10s\n", "n", "alpha", "power", "mcse", "failed", "separated")
     for (i = 1; i <= rows(x.results); i++)
         printf("{res}%10.0f %9.4f %8.4f %8.4f %8.4f %10.4f\n",
@@ -114,9 +131,16 @@ struct pape_res scalar pape_n(struct pape_dgp scalar d, real scalar power,
     real scalar best_n, best_power, best_mcse, best_sep, best_mc, confirmed, found
     real matrix hist
     string scalar se_use
+    // a difference-in-differences design must be analysed on the scale its
+    // trends are parallel on, or "the n that reaches the goal" has no meaning
+    pape_did_need_valid(d, "powerape n")
     se_use = se
     if (se != "model" & (d.route == "panel" | d.route == "iv")) {
         printf("{err}warning: se() is fixed by the route; se(%s) is ignored.\n", se)
+        se_use = "model"
+    }
+    if (se != "model" & pape_did_se_fixed(d)) {
+        if (d.analysis != "linear") printf("{err}warning: se() is fixed by the route; se(%s) is ignored.\n", se)
         se_use = "model"
     }
     n_pilot = 2000
@@ -180,7 +204,7 @@ struct pape_res scalar pape_n(struct pape_dgp scalar d, real scalar power,
     }
     if (best_n >= n_hi)
         printf("{err}warning: required n reached the nrange() ceiling; treat the result as a lower bound.\n")
-    (void) pape_sparse_warning(best_sep, best_mc, separation, sprintf("At the returned n = %f", best_n), d.estimand == "aie")
+    (void) pape_sparse_warning(best_sep, best_mc, separation, sprintf("At the returned n = %f", best_n), pape_cell_code(d, d.estimand == "aie"))
     lv_b = pape_claim_levels(claim, alpha, conf, best_n, rule)
     r.kind = "n"
     r.n = best_n; r.power = best_power; r.mcse = best_mcse
@@ -213,12 +237,12 @@ void pape_print_n(struct pape_res scalar x)
     real scalar n_search, n_conf
     printf("{txt}powerape required sample size -- %s claim\n", x.claim)
     lab = (x.confirmed ? "confirmed" : "achieved")
-    if (x.dgp.route == "panel") unit_lab = sprintf("n = %f units (x %s periods)", x.n, pape_panel_len_label(x.dgp))
+    if (pape_unit_design(x.dgp)) unit_lab = sprintf("n = %f units (x %s periods)", x.n, pape_panel_len_label(x.dgp))
     else unit_lab = sprintf("n = %f", x.n)
     printf("  %s for %2.0f%% target power (%s %5.3f, MCSE %5.3f)\n", unit_lab, 100 * x.goal, lab, x.power, x.mcse)
     printf("  assumed true %s %s%7.4f, sesoi %s, %6.4g%% CI (alpha = %6.4g%s), %s%s\n",
         strupper(x.estimand), pape_sgn(x.target), x.target, (x.sesoi == . ? "-" : sprintf("%5.3f", x.sesoi)),
-        100 * x.conf, x.alpha, (x.has_rule ? " by sample-size rule" : ""), x.model, pape_se_lab(x))
+        100 * x.conf, x.alpha, (x.has_rule ? " by sample-size rule" : ""), pape_model_label(x.dgp), pape_se_lab(x))
     printf("  fit: %s\n", x.fit)
     n_search = sum(x.history[., 1] :== 1)
     n_conf = sum(x.history[., 1] :== 2)
@@ -263,9 +287,16 @@ struct pape_res scalar pape_mde(struct pape_dgp scalar dgp, real scalar n,
     real matrix hist
     real colvector t_try
     string scalar msg, st, dir, se_use, est_lab
+    pape_did_need_valid(dgp, "powerape mde")
+    if (dgp.route == "did" & dgp.has_sub & !dgp.has_effect)
+        pape_err("powerape mde searches the difference between the subgroups' effects and holds the reference subgroup's effect fixed: pin the design first with powerape setatt NAME, target(reference_effect any_value).")
     se_use = se
     if (se != "model" & (dgp.route == "panel" | dgp.route == "iv")) {
         printf("{err}warning: se() is fixed by the route; se(%s) is ignored.\n", se)
+        se_use = "model"
+    }
+    if (se != "model" & pape_did_se_fixed(dgp)) {
+        if (dgp.analysis != "linear") printf("{err}warning: se() is fixed by the route; se(%s) is ignored.\n", se)
         se_use = "model"
     }
     if (n == . | n < 20) pape_err("n() must be at least 20.")
@@ -285,6 +316,7 @@ struct pape_res scalar pape_mde(struct pape_dgp scalar dgp, real scalar n,
     if (is_aie & (mf == . | mm == .))
         pape_err("An AIE MDE needs the main-effect anchors: pin the DGP with powerape setaie first, or pass mainfocal() and mainmoderator().")
     est_lab = (is_aie ? "AIE" : "APE")
+    if (dgp.route == "did") est_lab = (dgp.has_sub ? "DATT" : "ATT")
     z = pape_zcrit(conf)
     zg = invnormal(power)
     st = ((dgp.route == "panel" | dgp.route == "iv") ? "model" : se_use)
@@ -429,7 +461,7 @@ struct pape_res scalar pape_finish_mde(struct pape_dgp scalar dgp, real scalar n
             }
         }
     }
-    (void) pape_sparse_warning(best_sep, best_mc, separation, "At the returned " + (is_margin ? "margin" : "MDE"), dgp.has_m)
+    (void) pape_sparse_warning(best_sep, best_mc, separation, "At the returned " + (is_margin ? "margin" : "MDE"), pape_cell_code(dgp, dgp.has_m))
     dgp_at = dgp
     if (!is_margin) {
         rc = pape_repin(dgp_at, best_value, mf, mm, msg)
@@ -448,6 +480,7 @@ struct pape_res scalar pape_finish_mde(struct pape_dgp scalar dgp, real scalar n
     r.direction = (is_margin ? "" : (sgn < 0 ? "negative" : "positive"))
     r.separation = separation; r.separated = best_sep; r.min_cell = best_mc
     r.estimand = (dgp.has_m ? "aie" : "ape")
+    if (dgp.route == "did") r.estimand = (dgp.has_sub ? "datt" : "att")
     r.model = dgp.model
     r.history = hist
     r.dgp = dgp_at
@@ -464,7 +497,7 @@ void pape_print_mde(struct pape_res scalar x)
 {
     string scalar unit_lab
     real scalar n_search, n_conf
-    if (x.dgp.route == "panel") unit_lab = sprintf("n = %f units (x %s periods)", x.n, pape_panel_len_label(x.dgp))
+    if (pape_unit_design(x.dgp)) unit_lab = sprintf("n = %f units (x %s periods)", x.n, pape_panel_len_label(x.dgp))
     else unit_lab = sprintf("n = %f", x.n)
     if (x.is_margin) {
         printf("{txt}powerape minimum establishable equivalence margin -- %s\n", strupper(x.estimand))
@@ -482,6 +515,7 @@ void pape_print_mde(struct pape_res scalar x)
         }
     }
     if (x.has_rule) printf("  alpha = %6.4g by sample-size rule (%6.4g%% CI)\n", x.alpha, 100 * x.conf)
+    if (pape_did_linear(x.dgp)) printf("  analysis: %s%s\n", pape_model_label(x.dgp), pape_did_se_label(x.dgp))
     printf("  fit: %s\n", x.fit)
     n_search = sum(x.history[., 1] :== 1)
     n_conf = sum(x.history[., 1] :== 2)
@@ -523,7 +557,10 @@ struct pape_dgp scalar pape_boundary_dgp(struct pape_dgp scalar dgp, string scal
     sgn = (target < 0 ? -1 : 1)
     b = (claim == "detect" ? 0 : sgn * sesoi)
     d = dgp
-    if (d.estimand == "aie") rc = pape_set_aie(d, b, d.main_focal, d.main_moderator, msg)
+    // difference-in-differences designs: re-pin the effect on the treated
+    // (for subgroup designs the difference, the reference effect held)
+    if (d.route == "did") rc = pape_repin(d, b, ., ., msg)
+    else if (d.estimand == "aie") rc = pape_set_aie(d, b, d.main_focal, d.main_moderator, msg)
     else rc = pape_set_ape(d, b, msg)
     if (rc) pape_err(msg)
     return(d)
@@ -542,6 +579,7 @@ struct pape_alpha scalar pape_alpha_fn(struct pape_res scalar x, real scalar cos
     real scalar i_free, i_cap, tol, i_def, ns, sgn, j
     string scalar se_type
     if (x.kind != "power") pape_err("powerape alpha needs a powerape power result.")
+    pape_did_power_only(x.dgp, "powerape alpha")
     if (!x.has_draws) pape_err("The result carries no stored draws; rerun powerape power without nodraws.")
     if (cost == . | cost <= 0 | prior == . | prior <= 0) pape_err("cost() and prior() must be positive.")
     if (cap == . | cap <= 0 | cap >= 0.5) pape_err("cap() must lie in (0, 0.5).")
@@ -684,6 +722,7 @@ string scalar pape_describe_dgp(struct pape_dgp scalar d)
     string scalar parts, covs, foc, cv, dep, sig, over, s, insts
     string rowvector blk
     real scalar is_panel, is_iv, n_vars, j
+    if (d.route == "did") return(pape_describe_did(d))
     is_panel = (d.route == "panel"); is_iv = (d.route == "iv")
     if (is_panel)
         parts = sprintf("a correlated random effects %s model over %s periods per unit (latent unit-effect share rho = %4.2f, %2.0f%% of it loaded on regressor means), estimated by pooled %s with Mundlak means%s and unit-clustered standard errors, with focal variable %s",
@@ -753,6 +792,9 @@ string scalar pape_statement(struct pape_res scalar x)
     struct pape_dgp scalar d
     string scalar est_long, est_short, subject, s1, s2, s3, s4, s5, s6, n_text, conf_frag, est_desc, cell, size_noun
     real scalar is_aie, is_panel, rule, keep, sepd, other
+    // difference-in-differences designs have their own paragraph, for both
+    // analyses; a rejection rate is not reported as power
+    if (x.dgp.route == "did") return(pape_did_statement(x))
     d = x.dgp
     rule = x.has_rule
     is_aie = (x.estimand == "aie")
@@ -821,12 +863,18 @@ string scalar pape_alpha_statement(struct pape_alpha scalar x)
 {
     string scalar est_short, how, n_text, s1, s2, s3, s4, s5
     est_short = (x.estimand == "aie" ? "AIE" : "APE")
+    if (x.estimand == "datt") est_short = "difference in ATTs"
+    else if (x.estimand == "att") est_short = "ATT"
     how = (x.error == "minimize" ? "minimizing the weighted combined Type I and Type II error rate" : "balancing the cost-weighted Type I and Type II error rates")
-    n_text = (x.dgp.route == "panel" ? sprintf("n = %f units", x.n) : sprintf("n = %f", x.n))
+    n_text = (pape_unit_design(x.dgp) ? sprintf("n = %f units", x.n) : sprintf("n = %f", x.n))
     s1 = sprintf("We chose the error rate for %s by %s (Maier & Lakens, 2022; Mudge et al., 2012), weighting a Type I error %g times a Type II error and taking prior odds of %g for the planning value (%s = %5.3f) against the claim boundary, using the powerape package for Stata (version %s).",
         pape_claim_text(x.claim, x.sesoi, pape_claim_levels(x.claim, x.alpha, ., ., "")[4], 0),
         how, x.cost, x.prior, est_short, x.target, pape_version())
     s2 = sprintf("The assumed data-generating process was %s.", pape_describe_dgp(x.dgp))
+    // difference-in-differences designs: the world's description does not
+    // name the analysis, so say it
+    if (x.dgp.route == "did")
+        s2 = s2 + sprintf(" Each simulated study was analysed by %s.", pape_did_analysis_text(x.dgp, x.se))
     s3 = sprintf("At %s the optimum within the conventional cap of alpha = %g was alpha = %6.4f: simulated power %5.3f (Monte Carlo SE %5.3f; %f replications), a Type II error rate of %5.3f, and a weighted combined error rate of %6.4f versus %6.4f at alpha = 0.05; error rates between %6.4f and %6.4f are indistinguishable from the optimum at this precision.",
         n_text, x.cap, x.alpha, x.power, x.mcse, x.nsim, x.beta, x.wcer, x.wcer_default, x.range[1], x.range[2])
     s4 = (x.capped ? sprintf("The unconstrained optimum, alpha = %6.4f (weighted combined error rate %6.4f), lies above the cap; because raising the error rate above the conventional level needs a justification of its own (Maier & Lakens, 2022), the capped value is reported.", x.alpha_uncapped, x.wcer_uncapped) : "")

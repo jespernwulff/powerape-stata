@@ -65,6 +65,20 @@ The site walks through these steps with their output:
   panel probit with Mundlak means, unit-clustered standard errors and
   unbalanced panels (`panel`); an endogenous treatment estimated by control
   functions, the estimator of `cfprobit` (`iv`).
+* **Difference-in-differences designs (`did`; in development, after 0.1.3).**
+  A treated and a control group before and after one treatment date, as a
+  panel or as repeated cross-sections, with one or several periods on each
+  side. The target is the effect on the treated in probability points, pinned
+  with `setatt`. The simulated world has untreated trends that are parallel
+  on the probit/logit index or in probabilities (`trends()`), and each study
+  is analysed by a pooled probit/logit, with the effect as an average partial
+  effect over the treated post-period observations, or by a linear
+  probability model with robust standard errors (`analysis()`). When the
+  analysis assumes another scale than the world has, the result is reported
+  as a rejection rate with the mean of the estimates. A binary `subgroup()`
+  makes the estimand the difference between the two subgroups' effects, and
+  `dgp ..., didpilot` builds the design from pre-treatment data. See
+  `help powerape`, section "Difference-in-differences designs".
 * **Effects.** APEs of binary and continuous variables and AIEs (the
   estimand of `ginteff`), pinned in probability points by `setape` and
   `setaie`; targets that cannot exist are refused with the attainable range.
@@ -85,7 +99,11 @@ them with `margins` or `ginteff` themselves. `engine(mata)` fits each study
 with a Mata port of the R package's routine and is 10 to 30 times faster:
 use it for searches, curves and sweeps, and confirm the final design with
 `engine(stata)`. Every simulation command prints a `fit:` line that names
-the engine.
+the engine. For difference-in-differences designs the default engine fits
+`logit` or `probit` with `vce(cluster)` in panels and computes the effect on
+the treated as `margins, dydx(w) subpop(if w == 1)` does (or calls it, with
+`effects(margins)`); the linear analysis is `regress` with `vce(robust)` or
+`vce(cluster)`.
 
 ## Requirements
 
@@ -127,7 +145,27 @@ also use `cfprobit` and `ginteff` (see Requirements); the scripts declare
 tests run from the root too: `Rscript validation/tierD_r.R`,
 `do tests/run-tests.do`.
 
+The difference-in-differences route has the same four tiers in files of its
+own, so the scripts and results above are untouched: `v_did_tierA.do` to
+`v_did_tierD.do`, with `did-tier?-results.txt` and `v_did_tier?.log`. Tier A
+enumerates the four group-by-period cells (exact power under the logit,
+probit and linear analyses); Tier B compares the estimators on fixed data
+with R and with `logit`/`probit` + `margins`, `regress`, `didregress` and
+`xtdidregress`; Tier C compares the calibration constants; Tier D compares
+simulated power, rejection rates, sample sizes, detectable effects, sweeps
+and justified alpha. Their R references (`did_export_fixtures.R`,
+`did_tierD_r.R`) need the development version of the R package, which has the
+route: set the environment variable `POWERAPE_R_DEV` to its source tree
+before running them. Tier B takes about a minute, Tier C two, Tier A about
+ten and Tier D about 25 minutes.
+
 ## Version history
+
+* In development (after 0.1.3, not released): difference-in-differences
+  designs (`powerape dgp ..., did`, `setatt`, `trueatt`, `dgp ..., didpilot`,
+  `vary(trends(index linear))` in `robust`), with the probit/logit analysis
+  and the linear probability analysis under both engines. Results of the
+  other routes are bit-identical to 0.1.3.
 
 * 0.1.3 (2026-10-17): panel designs calibrate about as fast as in the R
   package. A panel `powerape dgp`, `setape`, `setaie`, `trueape` or
@@ -147,6 +185,9 @@ tests run from the root too: `Rscript validation/tierD_r.R`,
 
 ## References
 
+Caron, L. (2025). Triple difference designs with heterogeneous treatment
+effects. arXiv:2502.19620.
+
 Hancock, G. R., & Feng, Y. (2026). nmax and the quest to restore caution,
 integrity, and practicality to the sample size planning process.
 *Psychological Methods*, *31*(1), 174--199. <https://doi.org/10.1037/met0000776>
@@ -154,6 +195,10 @@ integrity, and practicality to the sample size planning process.
 Maier, M., & Lakens, D. (2022). Justify your alpha: A primer on two
 practical approaches. *Advances in Methods and Practices in Psychological
 Science*, 5(2). <https://doi.org/10.1177/25152459221080396>
+
+Puhani, P. A. (2012). The treatment effect, the cross difference, and the
+interaction term in nonlinear "difference-in-differences" models. *Economics
+Letters*, 115(1), 85--87.
 
 Radean, M. (2023). ginteff: A generalized command for computing interaction
 effects. *The Stata Journal*, 23(2), 301--335.
@@ -163,6 +208,10 @@ Riesthuis, P. (2024). Simulation-based power analyses for the smallest
 effect size of interest: A confidence-interval approach for minimum-effect
 and equivalence testing. *Advances in Methods and Practices in Psychological
 Science*, 7(2). <https://doi.org/10.1177/25152459241240722>
+
+Wooldridge, J. M. (2023). Simple approaches to nonlinear
+difference-in-differences with panel data. *The Econometrics Journal*,
+26(3), C31--C66.
 
 ## Author
 

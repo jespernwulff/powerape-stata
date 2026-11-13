@@ -197,7 +197,31 @@ powerape power iv_design, n(1500) claim(detect) nsim(200) seed(14)
 powerape power iv_design, n(1500) claim(detect) nsim(30) seed(14) engine(stata)
 
 * ---------------------------------------------------------------------------
-* 11. Housekeeping
+* 11. Difference-in-differences: the effect on the treated in probability points
+* ---------------------------------------------------------------------------
+* A treated and a control group before and after one treatment date. The
+* world is three rates (control before, the gap between the groups before,
+* the control group's change) and the scale on which untreated trends are
+* parallel: the logit index (default) or probabilities (trends(linear)).
+powerape dgp did_design, did model(logit) baseline(0.20) gap(0.20) trend(0.10) rho(0.4)
+powerape setatt did_design, target(0.07)           // the design print shows both readings
+powerape trueatt did_design
+powerape power did_design, n(1500) claim(detect) nsim(200) seed(15) engine(mata)
+* logit with vce(cluster) fitting each study, the effect as margins computes it:
+powerape power did_design, n(1500) claim(detect) nsim(50) seed(15) engine(stata)
+* the same question when trends are parallel in probabilities and the study
+* is analysed by a linear probability model (always robust standard errors):
+powerape dgp did_linear, did baseline(0.20) gap(0.20) trend(0.10) rho(0.4) ///
+    trends(linear) analysis(linear)
+powerape setatt did_linear, target(0.07)
+powerape n did_linear, power(0.80) claim(detect) nsim(300) seed(16) engine(mata)
+* what if the trends are parallel on the other scale? The effect is held, the
+* world changes; the scenario the analysis is biased in is flagged, not ranked.
+powerape robust did_design, n(1500) claim(detect) vary(trends(index linear)) ///
+    nsim(200) seed(17) nonmax engine(mata)
+
+* ---------------------------------------------------------------------------
+* 12. Housekeeping
 * ---------------------------------------------------------------------------
 powerape engine, engine(stata) effects(closed)     // back to the default
 powerape list                                      // stored DGPs and results

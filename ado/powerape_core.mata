@@ -59,6 +59,19 @@ struct pape_dgp {
     real scalar kappa0, sigma_v
     // spec (for rebuilds in the robustness sweep)
     string scalar spec_opts
+    // difference-in-differences designs (powerape_did.mata); route "did".
+    // Row vectors hold one entry, or two with a subgroup (reference first).
+    string scalar design, trends, analysis   // panel | cross-sections; index | linear
+    real scalar p_treated, p_post, p_post_given, n_pre, n_post, has_sub
+    struct pape_var scalar subgroup
+    real rowvector did_base, did_gap, did_trend
+    real rowvector did_a, did_b, did_l, did_th, did_de
+    real rowvector c00, c10, c01, cf, c11
+    real rowvector att_sub
+    // design built from pre-treatment pilot data (n_rows, n_units, n_periods,
+    // n_pairs, baseline, gap, p_treated, rho, control_change)
+    real rowvector pilot
+    string scalar pilot_over
 }
 
 struct pape_idraw {
@@ -496,6 +509,16 @@ struct pape_dgp scalar pape_dgp_blank()
     d.pi_z = J(0, 1, .); d.kappa0 = .; d.sigma_v = .
     d.spec_opts = ""
     d.mod_ref = .
+    d.design = ""; d.trends = ""; d.analysis = ""
+    d.p_treated = .; d.p_post = .; d.p_post_given = 0
+    d.n_pre = .; d.n_post = .; d.has_sub = 0
+    d.did_base = J(1, 0, .); d.did_gap = J(1, 0, .); d.did_trend = J(1, 0, .)
+    d.did_a = J(1, 0, .); d.did_b = J(1, 0, .); d.did_l = J(1, 0, .)
+    d.did_th = J(1, 0, .); d.did_de = J(1, 0, .)
+    d.c00 = J(1, 0, .); d.c10 = J(1, 0, .); d.c01 = J(1, 0, .)
+    d.cf = J(1, 0, .); d.c11 = J(1, 0, .)
+    d.att_sub = J(1, 0, .)
+    d.pilot = J(1, 0, .); d.pilot_over = ""
     return(d)
 }
 
@@ -871,6 +894,10 @@ real scalar pape_set_ape(struct pape_dgp scalar d, real scalar target, string sc
     real colvector idxz
     real scalar p0, root, rc
     msg = ""
+    if (d.route == "did") {
+        msg = "This is a difference-in-differences design: pin the effect on the treated with powerape setatt."
+        return(1)
+    }
     if (target == .) {
         msg = "target() must be a number."
         return(1)
@@ -911,6 +938,7 @@ real scalar pape_true_ape(struct pape_dgp scalar d)
 {
     struct pape_idraw scalar id
     real colvector idxz
+    if (d.route == "did") pape_err("This is a difference-in-differences design: its true effect is reported by powerape trueatt.")
     if (d.estimand != "ape") pape_err("This DGP has no pinned APE; run powerape setape first.")
     if (d.route == "panel") return(pape_true_ape_panel(d))
     if (d.focal.type == "binary") {
@@ -965,6 +993,10 @@ real scalar pape_set_aie(struct pape_dgp scalar d, real scalar target,
     struct pape_env scalar e
     real scalar p0, bf, bm, bi, rc, s_d, s_m
     msg = ""
+    if (d.route == "did") {
+        msg = "This is a difference-in-differences design: pin the effect on the treated with powerape setatt."
+        return(1)
+    }
     if (!d.has_m) {
         msg = "This DGP has no moderator: add one in powerape dgp, or pin an APE with powerape setape."
         return(1)
@@ -1009,6 +1041,7 @@ real scalar pape_set_aie(struct pape_dgp scalar d, real scalar target,
 
 real scalar pape_true_aie(struct pape_dgp scalar d)
 {
+    if (d.route == "did") pape_err("This is a difference-in-differences design: its true effect is reported by powerape trueatt.")
     if (d.estimand != "aie") pape_err("This DGP has no pinned AIE; run powerape setaie first.")
     if (d.route == "panel") return(pape_true_aie_panel(d))
     return(pape_truth_aie(d, d.beta_focal, d.beta_mod, d.beta_int, pape_integration_draw(d)))
@@ -1018,6 +1051,12 @@ real scalar pape_true_aie(struct pape_dgp scalar d)
 real scalar pape_repin(struct pape_dgp scalar d, real scalar target,
     real scalar mf, real scalar mm, string scalar msg)
 {
+    if (d.route == "did") {
+        // subgroup designs: move the difference, holding the reference
+        // subgroup's effect at its pinned value
+        if (d.has_sub) return(pape_set_att(d, (d.att_sub[1], d.att_sub[1] + target), msg))
+        return(pape_set_att(d, target, msg))
+    }
     if (d.has_m) return(pape_set_aie(d, target, mf, mm, msg))
     return(pape_set_ape(d, target, msg))
 }
@@ -1041,6 +1080,10 @@ void pape_print_dgp(struct pape_dgp scalar x)
 {
     string scalar labs, sig, note
     real scalar j
+    if (x.route == "did") {
+        pape_print_did_dgp(x)
+        return
+    }
     printf("{txt}powerape DGP -- %s%s\n", x.model, (x.route == "empirical" ? " (empirical covariates)" : ""))
     note = ""
     if (x.route == "empirical")

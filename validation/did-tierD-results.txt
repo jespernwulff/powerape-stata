@@ -1,0 +1,54 @@
+P1 logit panel, detect, n 1500, engine(mata)                   Stata   0.5517 (MCSE 0.0079)  R   0.5445 (MCSE 0.0079)  |diff| 0.0072  tol 0.0334  PASS
+P1 mean of the estimates                                       Stata   0.0694 (MCSE 0.0005)  R   0.0699 (MCSE 0.0005)  |diff| 0.0005  tol 0.0022  PASS
+P1 minimum (sesoi .02), engine(mata)                           Stata   0.4250 (MCSE 0.0078)  R   0.4360 (MCSE 0.0078)  |diff| 0.0110  tol 0.0332  PASS
+P1 detect-only share                                           Stata   0.1163 (MCSE 0.0051)  R   0.1138 (MCSE 0.0050)  |diff| 0.0025  tol 0.0214  PASS
+P1 inconclusive share                                          Stata   0.4587 (MCSE 0.0079)  R   0.4502 (MCSE 0.0079)  |diff| 0.0085  tol 0.0334  PASS
+P1 detect, engine(stata) logit vce(cluster), nsim 1000         Stata   0.5720 (MCSE 0.0156)  R   0.5445 (MCSE 0.0079)  |diff| 0.0275  tol 0.0525  PASS
+P1 detect, engine(stata) effects(margins), nsim 300            Stata   0.5567 (MCSE 0.0287)  R   0.5445 (MCSE 0.0079)  |diff| 0.0122  tol 0.0892  PASS
+P2 probit cross-sections + covariate, engine(mata)             Stata   0.5383 (MCSE 0.0079)  R   0.5475 (MCSE 0.0079)  |diff| 0.0092  tol 0.0334  PASS
+P2 mean of the estimates                                       Stata   0.0801 (MCSE 0.0006)  R   0.0801 (MCSE 0.0006)  |diff| 0.0001  tol 0.0026  PASS
+P2 robust SEs, engine(mata)                                    Stata   0.5383 (MCSE 0.0079)  R   0.5435 (MCSE 0.0079)  |diff| 0.0052  tol 0.0334  PASS
+P2 engine(stata) probit, nsim 1000                             Stata   0.5500 (MCSE 0.0157)  R   0.5475 (MCSE 0.0079)  |diff| 0.0025  tol 0.0528  PASS
+P2 engine(stata) probit vce(robust), nsim 1000                 Stata   0.5490 (MCSE 0.0157)  R   0.5435 (MCSE 0.0079)  |diff| 0.0055  tol 0.0528  PASS
+P3 linear analysis, panel, engine(mata)                        Stata   0.7837 (MCSE 0.0065)  R   0.7837 (MCSE 0.0065)  |diff| 0.0000  tol 0.0276  PASS
+P3 mean of the estimates                                       Stata   0.0996 (MCSE 0.0006)  R   0.0990 (MCSE 0.0006)  |diff| 0.0006  tol 0.0024  PASS
+P3 engine(stata) regress vce(cluster), nsim 1000               Stata   0.7830 (MCSE 0.0130)  R   0.7837 (MCSE 0.0065)  |diff| 0.0007  tol 0.0437  PASS
+P4 linear analysis, cross-sections, engine(mata)               Stata   0.5250 (MCSE 0.0079)  R   0.5220 (MCSE 0.0079)  |diff| 0.0030  tol 0.0335  PASS
+P4 engine(stata) regress vce(robust), nsim 1000                Stata   0.5470 (MCSE 0.0157)  R   0.5220 (MCSE 0.0079)  |diff| 0.0250  tol 0.0528  PASS
+P5a logit analysis in a linear world: rejection rate           Stata   0.3630 (MCSE 0.0076)  R   0.3425 (MCSE 0.0075)  |diff| 0.0205  tol 0.0320  PASS
+P5a mean of the estimates (truth .100)                         Stata   0.0678 (MCSE 0.0007)  R   0.0663 (MCSE 0.0007)  |diff| 0.0015  tol 0.0028  PASS
+P5a flagged as not valid (r(valid) = 0)                        Stata    0.0000  R    0.0000  rel.diff  0.0e+00  tol  0.0e+00  PASS
+P5b linear analysis in an index world: rejection rate          Stata   0.7917 (MCSE 0.0064)  R   0.7802 (MCSE 0.0065)  |diff| 0.0115  tol 0.0275  PASS
+P5b mean of the estimates (truth .0667)                        Stata   0.0989 (MCSE 0.0006)  R   0.0995 (MCSE 0.0006)  |diff| 0.0006  tol 0.0024  PASS
+P6 two periods a side, logit panel, engine(mata)               Stata   0.8177 (MCSE 0.0061)  R   0.8143 (MCSE 0.0061)  |diff| 0.0035  tol 0.0260  PASS
+P6 engine(stata) logit vce(cluster), nsim 1000                 Stata   0.8100 (MCSE 0.0124)  R   0.8143 (MCSE 0.0061)  |diff| 0.0042  tol 0.0415  PASS
+P6x 2 + 3 periods, cross-sections, linear analysis             Stata   0.4813 (MCSE 0.0079)  R   0.4860 (MCSE 0.0079)  |diff| 0.0047  tol 0.0335  PASS
+P7 subgroup difference, logit, engine(mata)                    Stata   0.4138 (MCSE 0.0078)  R   0.4052 (MCSE 0.0078)  |diff| 0.0085  tol 0.0330  PASS
+P7 mean of the estimates (truth -.070)                         Stata  -0.0714 (MCSE 0.0006)  R  -0.0703 (MCSE 0.0006)  |diff| 0.0011  tol 0.0027  PASS
+P7 engine(stata) logit vce(cluster), nsim 600                  Stata   0.4200 (MCSE 0.0201)  R   0.4052 (MCSE 0.0078)  |diff| 0.0147  tol 0.0648  PASS
+P7 engine(stata) margins over(), nsim 200                      Stata   0.3950 (MCSE 0.0346)  R   0.4052 (MCSE 0.0078)  |diff| 0.0102  tol 0.1063  PASS
+P7l subgroup difference, linear analysis, engine(mata)         Stata   0.5068 (MCSE 0.0079)  R   0.5090 (MCSE 0.0079)  |diff| 0.0022  tol 0.0335  PASS
+P7l engine(stata) regress vce(cluster), nsim 1000              Stata   0.5350 (MCSE 0.0158)  R   0.5090 (MCSE 0.0079)  |diff| 0.0260  tol 0.0529  PASS
+P8 required n, P1 detect 80%                                   Stata 2692.0000  R 2692.0000  rel.diff  0.0e+00  tol  6.0e-02  PASS
+P8 confirmation rule satisfied (1 = yes)                       Stata    1.0000  R    1.0000  rel.diff  0.0e+00  tol  0.0e+00  PASS
+P8 required n, P3 (linear analysis) detect 80%                 Stata  924.0000  R  921.0000  rel.diff  3.3e-03  tol  6.0e-02  PASS
+P8 required n, P6 (two periods a side) detect 80%              Stata 1448.0000  R 1449.0000  rel.diff  6.9e-04  tol  6.0e-02  PASS
+P9 MDE, P1 at 1,500 units                                      Stata    0.0958  R    0.0930  rel.diff  3.0e-02  tol  6.0e-02  PASS
+P9 MDE, P3 (linear analysis) at 900 units                      Stata    0.1011  R    0.1012  rel.diff  7.2e-04  tol  6.0e-02  PASS
+P9 MDE of the subgroup difference, P7 at 4,000 units           Stata   -0.1129  R   -0.1131  rel.diff  2.4e-03  tol  6.0e-02  PASS
+P10 sweep over rho, scenario 1 power                           Stata   0.4890 (MCSE 0.0112)  R   0.4760 (MCSE 0.0112)  |diff| 0.0130  tol 0.0474  PASS
+P10 sweep over rho, scenario 2 power                           Stata   0.5370 (MCSE 0.0111)  R   0.5450 (MCSE 0.0111)  |diff| 0.0080  tol 0.0473  PASS
+P10 sweep over rho, scenario 3 power                           Stata   0.6330 (MCSE 0.0108)  R   0.6195 (MCSE 0.0109)  |diff| 0.0135  tol 0.0459  PASS
+P10 sweep over trends, scenario 1 power / rejection rate       Stata   0.5570 (MCSE 0.0111)  R   0.5595 (MCSE 0.0111)  |diff| 0.0025  tol 0.0471  PASS
+P10 sweep over trends, scenario 1 mean estimate                Stata   0.0700 (MCSE 0.0015)  R   0.0695 (MCSE 0.0015)  |diff| 0.0005  tol 0.0064  PASS
+P10 sweep over trends, scenario 1 valid flag                   Stata    1.0000  R    1.0000  rel.diff  0.0e+00  tol  0.0e+00  PASS
+P10 sweep over trends, scenario 2 power / rejection rate       Stata   0.3450 (MCSE 0.0106)  R   0.3480 (MCSE 0.0107)  |diff| 0.0030  tol 0.0451  PASS
+P10 sweep over trends, scenario 2 mean estimate                Stata   0.0519 (MCSE 0.0015)  R   0.0519 (MCSE 0.0015)  |diff| 0.0000  tol 0.0064  PASS
+P10 sweep over trends, scenario 2 valid flag                   Stata    0.0000  R    0.0000  rel.diff  0.0e+00  tol  0.0e+00  PASS
+P11 power at alpha .01                                         Stata   0.2140 (MCSE 0.0065)  R   0.2070 (MCSE 0.0064)  |diff| 0.0070  tol 0.0273  PASS
+P11 power at alpha .025                                        Stata   0.3260 (MCSE 0.0074)  R   0.3210 (MCSE 0.0074)  |diff| 0.0050  tol 0.0314  PASS
+P11 power at alpha .05                                         Stata   0.4382 (MCSE 0.0078)  R   0.4355 (MCSE 0.0078)  |diff| 0.0027  tol 0.0333  PASS
+P11 power at alpha .10                                         Stata   0.5730 (MCSE 0.0078)  R   0.5783 (MCSE 0.0078)  |diff| 0.0053  tol 0.0332  PASS
+P11 alpha* (flat objective)                                    Stata    0.0355  R    0.0420  rel.diff  1.5e-01  tol  5.0e-01  PASS
+P11 weighted combined error at alpha*                          Stata    0.1516  R    0.1522  rel.diff  3.9e-03  tol  5.0e-02  PASS
+Tier D (difference-in-differences): 53 PASS, 0 FAIL
