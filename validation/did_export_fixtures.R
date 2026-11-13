@@ -4,9 +4,10 @@
 ## enumeration oracle (Tier A). Written to validation/data/ as didfix_*.csv,
 ## did-reference.csv (case, item, value) and did-tierA-sizes.csv.
 ##
-## The route is in the development version of the R package powerape (after
-## 1.11.4). Point the environment variable POWERAPE_R_DEV at that source tree
-## (it is loaded with pkgload), or install a powerape that has ape_dgp_did().
+## The route is in the R package powerape from version 1.12.0. This script
+## also reads a test helper from the package's source tree, so point the
+## environment variable POWERAPE_R_DEV at a clone of the R package (it is
+## loaded with pkgload).
 ## Run from the repository root:
 ##     Rscript validation/did_export_fixtures.R
 dev <- Sys.getenv("POWERAPE_R_DEV")

@@ -3,9 +3,9 @@
 ## package at 4,000 replications. Writes validation/data/did-tierD-reference.csv
 ## (design, quantity, value, mcse).
 ##
-## The route is in the development version of the R package powerape (after
-## 1.11.4). Point the environment variable POWERAPE_R_DEV at that source tree
-## (it is loaded with pkgload), or install a powerape that has ape_dgp_did().
+## The route is in the R package powerape from version 1.12.0: install it, or
+## point the environment variable POWERAPE_R_DEV at its source tree (it is
+## then loaded with pkgload).
 ## Run from the repository root:
 ##     Rscript validation/did_tierD_r.R > validation/did_tierD_r.log
 dev <- Sys.getenv("POWERAPE_R_DEV")

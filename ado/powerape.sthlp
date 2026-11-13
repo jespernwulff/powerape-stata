@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1.3  17oct2026}{...}
+{* *! version 0.2.0  13nov2026}{...}
 {vieweralsosee "[R] probit" "help probit"}{...}
 {vieweralsosee "[R] margins" "help margins"}{...}
 {vieweralsosee "[R] cfprobit" "help cfprobit"}{...}
@@ -120,7 +120,7 @@
 {title:Description}
 
 {pstd}
-{cmd:powerape} is a Stata port of the R package {bf:powerape} (version 1.11.3):
+{cmd:powerape} is a Stata port of the R package {bf:powerape} (version 1.12.0):
 simulation-based power analysis in which the effect size of interest is the
 average partial effect (APE) or the average interaction effect (AIE) of a
 probit or logit model. Targets are stated in probability points; the package
@@ -590,14 +590,16 @@ about a minute at the default {opt nint()}); it changes no number: the panel
 constants of tiers C and D are bit-identical to 0.1.2.
 
 {pstd}
-The difference-in-differences route (development version after 0.1.3) has its
-own four tiers, against the development version of the R package: exact power
+Version 0.2.0 (2026-11-13) adds the difference-in-differences route, which has
+its own four tiers, against version 1.12.0 of the R package: exact power
 by enumeration of the four group-by-period cells under both engines and both
 analyses; fixed-data parity with R's internals and with {cmd:logit}/{cmd:probit}
 + {cmd:margins}, {cmd:regress}, {cmd:didregress} and {cmd:xtdidregress};
 calibration constants; and stochastic agreement of power, rejection rates,
 required n, MDE, sweeps and justified alpha. The results of the routes that
-existed before are unchanged.
+existed before are unchanged. Not ported from version 1.12.0 of the R package:
+the three-way interaction design, and the linear probability analysis of the
+designs other than difference-in-differences.
 
 
 {title:References}
@@ -619,7 +621,7 @@ difference-in-differences with panel data. {it:The Econometrics Journal}
 {phang}Wooldridge, J. M. 2019. Correlated random effects models with
 unbalanced panels. {it:Journal of Econometrics} 211: 137-150.{p_end}
 {phang}Wulff, J. N. powerape: Power analysis for average partial effects. R
-package version 1.11.3. https://github.com/jespernwulff/powerape{p_end}
+package version 1.12.0. https://github.com/jespernwulff/powerape{p_end}
 
 
 {title:Author}

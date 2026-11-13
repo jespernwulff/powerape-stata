@@ -5,8 +5,8 @@
 * without covariates are closed forms and must agree to root-finding
 * tolerance; designs calibrated on a Monte Carlo integration draw differ by
 * integration noise (the two packages draw their own sets). Reference values
-* come from validation/did_export_fixtures.R, run on the development version
-* of the R package.
+* come from validation/did_export_fixtures.R, run on version 1.12.0 of the R
+* package.
 * Run from the repository root (the folder that holds ado/ and validation/):
 *     do validation/v_did_tierC.do
 * Writes validation/did-tierC-results.txt and the log validation/v_did_tierC.log.

@@ -65,7 +65,7 @@ The site walks through these steps with their output:
   panel probit with Mundlak means, unit-clustered standard errors and
   unbalanced panels (`panel`); an endogenous treatment estimated by control
   functions, the estimator of `cfprobit` (`iv`).
-* **Difference-in-differences designs (`did`; in development, after 0.1.3).**
+* **Difference-in-differences designs (`did`; new in 0.2.0).**
   A treated and a control group before and after one treatment date, as a
   panel or as repeated cross-sections, with one or several periods on each
   side. The target is the effect on the treated in probability points, pinned
@@ -154,19 +154,21 @@ with R and with `logit`/`probit` + `margins`, `regress`, `didregress` and
 `xtdidregress`; Tier C compares the calibration constants; Tier D compares
 simulated power, rejection rates, sample sizes, detectable effects, sweeps
 and justified alpha. Their R references (`did_export_fixtures.R`,
-`did_tierD_r.R`) need the development version of the R package, which has the
-route: set the environment variable `POWERAPE_R_DEV` to its source tree
-before running them. Tier B takes about a minute, Tier C two, Tier A about
+`did_tierD_r.R`) were run with version 1.12.0 of the R package, the first
+that has the route; `did_export_fixtures.R` also reads a test helper from the
+package's source tree, so set the environment variable `POWERAPE_R_DEV` to a
+clone of the R package before running them. Tier B takes about a minute, Tier C two, Tier A about
 ten and Tier D about 25 minutes.
 
 ## Version history
 
-* In development (after 0.1.3, not released): difference-in-differences
-  designs (`powerape dgp ..., did`, `setatt`, `trueatt`, `dgp ..., didpilot`,
+* 0.2.0 (2026-11-13): difference-in-differences designs
+  (`powerape dgp ..., did`, `setatt`, `trueatt`, `dgp ..., didpilot`,
   `vary(trends(index linear))` in `robust`), with the probit/logit analysis
   and the linear probability analysis under both engines. Results of the
-  other routes are bit-identical to 0.1.3.
-
+  other routes are bit-identical to 0.1.3. The command now follows the R
+  package powerape 1.12.0; not ported from it are the three-way interaction
+  design and the linear probability analysis of the other designs.
 * 0.1.3 (2026-10-17): panel designs calibrate about as fast as in the R
   package. A panel `powerape dgp`, `setape`, `setaie`, `trueape` or
   `trueaie` at the default `nint(1e5)` took about a minute and now takes one

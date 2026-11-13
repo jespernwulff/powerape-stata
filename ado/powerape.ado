@@ -1,6 +1,6 @@
-*! version 0.1.3  17oct2026  powerape for Stata -- power analysis for average
+*! version 0.2.0  13nov2026  powerape for Stata -- power analysis for average
 *! partial effects (APE) and average interaction effects (AIE). Port of the
-*! powerape R package 1.11.3 (Jesper Wulff). Estimation inside the
+*! powerape R package 1.12.0 (Jesper Wulff). Estimation inside the
 *! simulation loop uses Stata's own probit/logit/cfprobit (engine(stata), the
 *! default) with closed-form delta-method effects validated against margins
 *! and ginteff, or margins/ginteff themselves (effects(margins)).
@@ -598,7 +598,7 @@ end
 program powerape_version, rclass
     * the version string of this ado-file; must equal the first word of
     * pape_version() in lpowerape.mlib (powerape_search.mata)
-    local adov "0.1.3"
+    local adov "0.2.0"
     capture mata: st_local("v", pape_version())
     if _rc {
         local rc = _rc

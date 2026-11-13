@@ -8,7 +8,7 @@
 *! (ATT = average partial effect of the treatment indicator over the treated
 *! post-period rows) or by a linear probability model (OLS). Mirrors R/did.R,
 *! R/did-subgroup.R, R/did-statement.R, R/did-pilot.R and the OLS part of
-*! R/ape-math.R in the development version of the powerape R package.
+*! R/ape-math.R of the powerape R package 1.12.0.
 version 16
 mata:
 mata set matastrict on

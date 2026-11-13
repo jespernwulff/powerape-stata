@@ -13,11 +13,12 @@ Reference values come from `export_fixtures.R` (fixed datasets and R internals) 
 `tierD_r.R` (matched simulations), also run from the repository root. Raw result lines:
 `tier?-results.txt`; logs `v_tier?.log`.
 
-The difference-in-differences route, ported on 2026-11-13 and not released (the version
-strings are still 0.1.3), is validated in the last section, with scripts and result files
-of its own (`v_did_tier?.do`, `did-tier?-results.txt`): A 31/31, B 225/225, C 235/235,
-D 53/53 PASS against the development version of the R package. The four tiers below
-were rerun on that library and their result files and logs are byte-identical.
+The difference-in-differences route, ported on 2026-11-13 and released as version 0.2.0,
+is validated in the last two sections, with scripts and result files of its own
+(`v_did_tier?.do`, `did-tier?-results.txt`): A 31/31, B 225/225, C 235/235, D 53/53
+PASS against version 1.12.0 of the R package. The four tiers below were rerun on the
+0.2.0 library; their result files are byte-identical, and their logs differ only in
+the version line.
 
 **Updated 2026-10-16 (version 0.1.1):** all four tiers were regenerated after the
 engine changes of 0.1.1 (the Stata engine's `separation(keep)`, `effects(margins)`
@@ -610,7 +611,7 @@ on, each log equals the earlier batch log line for line; only the last line diff
   `tests/*_2026-10-1?.do` with their logs, and the `legacy/` folders that earlier
   sections cite.
 
-## 2026-11-13 difference-in-differences route (development version after 0.1.3)
+## 2026-11-13 difference-in-differences route (the port, before the 0.2.0 stamp)
 
 The R package gained a difference-in-differences route on 2026-11-11 (designs with a
 treated and a control group before and after one treatment date; the target is the
@@ -816,3 +817,40 @@ Evidence that nothing else moved:
 * Run times on this machine: `v_did_tierA.do` 11 min, B 1 min, C 2 min, D 25 min (three to
   four Stata jobs at a time); `did_export_fixtures.R` 18 min (the enumeration), 
   `did_tierD_r.R` 20 min.
+
+## 2026-11-13 version 0.2.0: the difference-in-differences route released
+
+Version 0.2.0 is the library of the previous section with the version strings changed
+and nothing else: `powerape.ado` (the constant and the `*!` line), `pape_version()` in
+`powerape_search.mata` (now "0.2.0 (Stata port of powerape 1.12.0)"), the help file, the
+package file and the showcase header, plus comments and documentation that said "in
+development". `build.do` rebuilt `lpowerape.mlib` (`powerape.ado` md5
+3a5e3a51f588ebbdb335a4c5832911cc, `lpowerape.mlib` md5 2174e138e80bca879387509f0a625c25;
+StataNow/SE 19.5, update 14 Oct 2026), and `powerape version` reports that the ado-file
+and the library agree. The R package was released as 1.12.0 from the source tree the
+previous section pins, so the command now names that version. Not ported from 1.12.0: the
+three-way interaction design and the linear probability analysis of the designs other
+than difference-in-differences.
+
+Everything was rerun on this library, from the repository root:
+
+* **The routes that existed before.** `tests/did_port_identity_2026-11-13.do`: the 288
+  seeded numbers are byte-identical to the file written before the port; the two printed
+  statements differ only in the version they name. Tiers A to D: 12/12, 171/171, 30/30
+  and 45/45 PASS; every `tier?-results.txt` is byte-identical to the 0.1.3 file, and
+  every `v_tier?.log` differs from it in one line, the version line.
+* **The difference-in-differences route.** The two R scripts were rerun with the R
+  package at 1.12.0 (`did_tierD_r.log` now says so): every file in `validation/data/` is
+  byte-identical to the one the previous section used. Tiers A to D of the route: 31/31,
+  225/225, 235/235 and 53/53 PASS; every `did-tier?-results.txt` is byte-identical, and
+  every `v_did_tier?.log` differs in the version line only.
+* **Regression tests and packaging.** `tests/run-tests.do`: 196 PASS, 0 FAIL.
+  `examples/showcase.do` runs without an error and prints version 0.2.0. A scratch
+  `net install` (PLUS and PERSONAL redirected) gives version 0.2.0 with the ado-file and
+  the library in agreement, runs a difference-in-differences design under both engines,
+  copies the two ancillary files with `net get`, compiles the library with `build.do` in
+  a copy of the repository, and uninstalls: 5/5 PASS.
+
+Run times with three to four jobs at a time: Tier A 17 min, B 1 min, C 2 min, D 22 min;
+the route's tiers A 10 min, B and C under a minute each, D 24 min; `run-tests.do` 9 min;
+the two R scripts 44 min together.

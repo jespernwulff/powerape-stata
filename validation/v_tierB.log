@@ -1,6 +1,6 @@
 
 . di as txt "powerape `pav'; Stata `c(stata_version)' (`c(born_date)')"
-powerape 0.1.3 (Stata port of powerape 1.11.3); Stata 19.5 (14 Oct 2026)
+powerape 0.2.0 (Stata port of powerape 1.12.0); Stata 19.5 (14 Oct 2026)
 
 . 
 . import delimited data/reference.csv, clear varnames(1) stringcols(1 2) asdoub
