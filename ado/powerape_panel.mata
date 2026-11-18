@@ -1,6 +1,6 @@
 *! powerape_panel.mata -- panel designs: correlated random effects probit
 *! (Mundlak means, unit-clustered SEs, unbalanced panels). Port of R/panel.R
-*! of powerape 1.11.3 (DESIGN.md sections 11 and 13). Probit-only.
+*! of powerape 1.11.3. Probit-only.
 version 16
 mata:
 mata set matastrict on
@@ -167,7 +167,7 @@ struct pape_dgp scalar pape_dgp_panel(string scalar name, string scalar model,
     k = rows(vars) - 1 - has_m
     d.k = k
     if (k > 0) d.covariates = vars[(2 + has_m)..rows(vars)]
-    // panel-length distribution (DESIGN.md section 13)
+    // panel-length distribution
     if (cols(p_periods) > 0 & retention != .) pape_err("Give either pperiods() or retention(), not both.")
     T_in = n_periods
     if (cols(T_in) < 1 | any(T_in :< 1) | any(T_in :!= floor(T_in))) pape_err("nperiods() must be positive integers.")

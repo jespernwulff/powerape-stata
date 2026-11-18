@@ -1,6 +1,6 @@
 *! powerape_iv.mata -- IV designs: endogenous focal, control-function probit
 *! (the estimator of Stata's cfprobit, with stacked method-of-moments SEs).
-*! Port of R/iv.R and R/cf.R of powerape 1.11.3 (DESIGN.md section 12).
+*! Port of R/iv.R and R/cf.R of powerape 1.11.3.
 version 16
 mata:
 mata set matastrict on
