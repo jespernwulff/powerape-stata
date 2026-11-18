@@ -638,6 +638,14 @@ sources the references ran on, between 16:52 and 17:20 on 2026-11-13: `did.R` 46
 `linear.R` 474ad9ec, `engine.R` 89d1a11d, `ape-math.R` bbe618f0, `robust.R` d659bf73,
 `alpha.R` db40c9ca, `mde.R` a6982226, `curve.R` 1b44ccf0.
 
+Added 2026-11-18: these are the sums of the files in commit 8a54008 of the R package's
+repository, the release of version 1.12.0, as the repository stores them. The exception
+is `curve.R`, whose sum was taken on a copy with Windows line endings; as stored in the
+repository its sum is 1d93f1a8. Two later commits, d769916 and 051c875, changed comment
+lines and no code in eight of the eleven files (`did.R`, `did-subgroup.R`, `did-pilot.R`,
+`did-statement.R`, `linear.R`, `engine.R`, `robust.R`, `alpha.R`), so those eight sums
+differ from the current files; `ape-math.R`, `mde.R` and `curve.R` are unchanged.
+
 The route has its own scripts and result files, so the files of the four tiers above are
 untouched: `v_did_tierA.do` to `v_did_tierD.do`, `did-tier?-results.txt`,
 `v_did_tier?.log`; R side `did_export_fixtures.R` (fixed data, R's estimates on them,
