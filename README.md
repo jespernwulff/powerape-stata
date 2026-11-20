@@ -154,14 +154,26 @@ with R and with `logit`/`probit` + `margins`, `regress`, `didregress` and
 `xtdidregress`; Tier C compares the calibration constants; Tier D compares
 simulated power, rejection rates, sample sizes, detectable effects, sweeps
 and justified alpha. Their R references (`did_export_fixtures.R`,
-`did_tierD_r.R`) were run with version 1.12.0 of the R package, the first
-that has the route; `did_export_fixtures.R` also reads a test helper from the
+`did_tierD_r.R`) were run with version 1.12.1 of the R package (the route
+exists from 1.12.0); `did_export_fixtures.R` also reads a test helper from the
 package's source tree, so set the environment variable `POWERAPE_R_DEV` to a
 clone of the R package before running them. Tier B takes about a minute, Tier C two, Tier A about
 ten and Tier D about 25 minutes.
 
 ## Version history
 
+* 0.2.1 (2026-11-20): `powerape dgp ..., didpilot` with `covariates()`
+  returns the `rho()` given the covariates. In a difference-in-differences
+  design `rho()` is the dependence between a unit's outcomes that is left
+  given the covariates, and 0.2.0 used the pilot's raw correlation together
+  with the covariates, which counted part of the dependence twice and
+  overstated power; the raw value is kept in `r(pilot)`. `power`, `curve`,
+  `n`, `mde` and `robust` warn when fewer than 30 units are expected in the
+  smaller group of a difference-in-differences design, where robust and
+  cluster-robust standard errors are too small. The help file says that
+  `rho()` is the correlation given the covariates. Results of existing
+  designs are bit-identical to 0.2.0. The command now follows the R package
+  powerape 1.12.1.
 * 0.2.0 (2026-11-13): difference-in-differences designs
   (`powerape dgp ..., did`, `setatt`, `trueatt`, `dgp ..., didpilot`,
   `vary(trends(index linear))` in `robust`), with the probit/logit analysis

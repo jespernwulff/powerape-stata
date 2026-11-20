@@ -1,6 +1,6 @@
 * v_did_tierD.do -- difference-in-differences route, stochastic parity with
 * the R package on matched designs. R reference values
-* (validation/did_tierD_r.R, version 1.12.0 of the R package, 4,000
+* (validation/did_tierD_r.R, version 1.12.1 of the R package, 4,000
 * replications per power) are compared with the Stata port at 4,000
 * replications (engine(mata)) and, for a subset, fewer replications of the
 * Stata engine (logit / probit / regress in the loop, and margins). RNG

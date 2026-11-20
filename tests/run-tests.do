@@ -601,6 +601,79 @@ powerape dgp kp5, didpilot outcome(y) group(treated) id(firm) trend(0.05) rho(0.
 check (abs(r(rho) - 0.3) < 1e-12) "didpilot: rho() supplied for a one-period pilot"
 clear
 
+* few independent units behind one group: the warning line (read back through
+* a named log). Ten treated units among 100 observed in eight periods: neither
+* the unit warning nor the sparse-cell warning sees them.
+powerape dgp kf, did model(logit) baseline(0.25) gap(0.10) trend(0.08) rho(0.4) ptreated(0.1) npre(4) npost(4) nodisplay
+powerape setatt kf, target(0.07) nodisplay
+powerape dgp kfx, did model(logit) baseline(0.25) gap(0.10) trend(0.08) design(cross-sections) ptreated(0.2) ppost(0.25) nodisplay
+powerape setatt kfx, target(0.07) nodisplay
+powerape dgp ke, did model(logit) baseline(0.25) gap(0.10) trend(0.08) rho(0.4) nodisplay
+powerape setatt ke, target(0.07) nodisplay
+tempfile fewlog
+local ls = c(linesize)
+set linesize 255
+log using "`fewlog'.log", text replace name(pape_fewchk)
+powerape power kf, n(100) claim(detect) nsim(30) seed(1) engine(mata)
+powerape power kf, n(400) claim(detect) nsim(30) seed(1) engine(mata)
+powerape power kfx, n(400) claim(detect) nsim(30) seed(1) engine(mata)
+powerape power ke, n(40) claim(detect) nsim(30) seed(1) engine(mata)
+powerape curve kf, n(100 400) claim(detect) nsim(30) seed(1) engine(mata)
+powerape robust ke, n(200) claim(detect) vary(ptreated(0.1 0.5)) gridpoints(2) nsim(30) seed(2) nonmax engine(mata)
+log close pape_fewchk
+set linesize `ls'
+mata: FL = cat(st_local("fewlog") + ".log")
+mata: st_local("few1", strofreal(sum(strpos(FL, "warning: about 10 units are expected in the treated group") :> 0)))
+mata: st_local("few2", strofreal(sum(strpos(FL, "warning: about 20 observations are expected in the treated group after the treatment date") :> 0)))
+mata: st_local("few3", strofreal(sum(strpos(FL, "warning: about 20 units are expected in each group") :> 0)))
+mata: st_local("few4", strofreal(sum(strpos(FL, "warning: At n = 100: about 10 units are expected in the treated group") :> 0)))
+mata: st_local("few5", strofreal(sum(strpos(FL, "in the scenario with the smallest group: about 20 units are expected in the treated group") :> 0)))
+check (`few1' == 1) "did: ten treated units in eight periods are warned about, and forty are not"
+check (`few2' == 1) "did: cross-sections count the smallest group-by-before/after cell"
+check (`few3' == 1) "did: groups of one size are named together"
+check (`few4' == 1) "did: the curve states the warning at the sizes it applies to"
+check (`few5' == 1) "did: the sweep warns for the scenario with the smallest group"
+capture erase "`fewlog'.log"
+
+* a pilot from a world with a covariate: probit, rho 0.20 GIVEN the covariate,
+* signal 0.30, so the raw latent correlation of a unit's outcomes is
+* (0.20 + s2)/(1 + s2) = 0.44 with s2 = 0.3/0.7. With covariates() the
+* command returns the rho given the covariates (60,000 units, two periods).
+set seed 62
+set obs 60000
+generate long firm = _n
+generate double a = rnormal()
+generate double z = rnormal()
+generate byte treated = runiform() < 0.4
+expand 2
+bysort firm: generate byte year = _n
+local s2 = 0.3 / 0.7
+generate double cc = cond(treated, invnormal(0.35), invnormal(0.25)) * sqrt(1 + `s2')
+generate byte y = cc + sqrt(`s2') * z - (sqrt(0.2) * a + sqrt(0.8) * rnormal()) > 0
+powerape dgp kc, didpilot outcome(y) group(treated) id(firm) period(year) trend(0.05) model(probit) ///
+    covariates((z, normal)) signal(0.3) nint(100000) nodisplay
+matrix PC = r(pilot)
+check (abs(r(rho) - 0.20) < 0.04 & abs(PC[1, 8] - r(rho)) < 1e-12) "didpilot with covariates: rho given the covariates is recovered"
+check (abs(PC[1, 10] - 0.44) < 0.03) "didpilot with covariates: the raw correlation is kept in r(pilot)"
+check (abs(r(rho) - (PC[1, 10] - 0.3) / 0.7) < 0.005) "didpilot with covariates: probit closed form (raw - signal)/(1 - signal)"
+powerape dgp kc0, didpilot outcome(y) group(treated) id(firm) period(year) trend(0.05) model(probit) nodisplay
+matrix P0 = r(pilot)
+check (reldif(P0[1, 8], P0[1, 10]) < 1e-12 & reldif(r(rho), PC[1, 10]) < 1e-9) "didpilot without covariates: rho is the raw correlation"
+powerape dgp kc1, didpilot outcome(y) group(treated) id(firm) period(year) trend(0.05) model(probit) ///
+    covariates((z, normal)) signal(0) nint(100000) nodisplay
+check (reldif(r(rho), PC[1, 10]) < 1e-9) "didpilot: covariates without signal leave rho as estimated"
+powerape dgp kc2, didpilot outcome(y) group(treated) id(firm) period(year) trend(0.05) model(probit) ///
+    covariates((z, normal)) signal(0.3) rho(0.33) nint(100000) nodisplay
+check (abs(r(rho) - 0.33) < 1e-12) "didpilot: a given rho() is not converted"
+powerape dgp kc3, didpilot outcome(y) group(treated) id(firm) period(year) trend(0.05) model(probit) ///
+    covariates((z, normal)) signal(0.7) nint(100000) nodisplay
+check (r(rho) == 0) "didpilot: a signal that implies more dependence than the pilot shows gives rho 0"
+powerape dgp kc4, didpilot outcome(y) group(treated) id(firm) period(year) trend(0.05) model(logit) ///
+    covariates((z, normal)) signal(0.3) nint(100000) nodisplay
+matrix PG = r(pilot)
+check (r(rho) > 0.05 & r(rho) < PG[1, 10] - 0.02) "didpilot with covariates, logit: rho given the covariates lies below the raw correlation"
+clear
+
 powerape drop _all
 di as txt _n "run-tests: $PAPE_NPASS PASS, $PAPE_NFAIL FAIL"
 if $PAPE_NFAIL > 0 {

@@ -41,6 +41,14 @@ struct pape_res scalar pape_curve(struct pape_dgp scalar d, real colvector n,
         where = "At n = " + invtokens(strofreal(sparse_at', "%12.0g"), ", ")
         (void) pape_sparse_warning(r.results[first, 6], r.results[first, 7], separation, where, pape_cell_code(d, d.estimand == "aie"))
     }
+    // difference-in-differences designs: few independent units behind one
+    // group, stated at the sizes it applies to (count at the smallest)
+    sparse_at = J(0, 1, .)
+    for (i = 1; i <= rows(n); i++) {
+        if (pape_did_few_units(d, n[i], where) != .) sparse_at = sparse_at \ n[i]
+    }
+    if (rows(sparse_at) > 0)
+        pape_did_few_warning(d, sparse_at[1], "At n = " + invtokens(strofreal(sparse_at', "%12.0g"), ", "))
     r.kind = "curve"
     r.claim = claim; r.sesoi = sesoi
     r.has_rule = (rule != "")
@@ -205,6 +213,7 @@ struct pape_res scalar pape_n(struct pape_dgp scalar d, real scalar power,
     if (best_n >= n_hi)
         printf("{err}warning: required n reached the nrange() ceiling; treat the result as a lower bound.\n")
     (void) pape_sparse_warning(best_sep, best_mc, separation, sprintf("At the returned n = %f", best_n), pape_cell_code(d, d.estimand == "aie"))
+    pape_did_few_warning(d, best_n, sprintf("At the returned n = %f", best_n))
     lv_b = pape_claim_levels(claim, alpha, conf, best_n, rule)
     r.kind = "n"
     r.n = best_n; r.power = best_power; r.mcse = best_mcse
@@ -462,6 +471,7 @@ struct pape_res scalar pape_finish_mde(struct pape_dgp scalar dgp, real scalar n
         }
     }
     (void) pape_sparse_warning(best_sep, best_mc, separation, "At the returned " + (is_margin ? "margin" : "MDE"), pape_cell_code(dgp, dgp.has_m))
+    pape_did_few_warning(dgp, n, "At the returned " + (is_margin ? "margin" : "MDE"))
     dgp_at = dgp
     if (!is_margin) {
         rc = pape_repin(dgp_at, best_value, mf, mm, msg)
@@ -785,7 +795,7 @@ string scalar pape_claim_text(string scalar claim, real scalar sesoi, real scala
     return(sprintf("the equivalence claim (the %s confidence interval lying within +/-%5.3f; two one-sided tests at alpha = %s%s)", cl, sesoi, al_txt, by_n))
 }
 
-string scalar pape_version() return("0.2.0 (Stata port of powerape 1.12.0)")
+string scalar pape_version() return("0.2.1 (Stata port of powerape 1.12.1)")
 
 string scalar pape_statement(struct pape_res scalar x)
 {

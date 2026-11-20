@@ -13,8 +13,12 @@ Reference values come from `export_fixtures.R` (fixed datasets and R internals) 
 `tierD_r.R` (matched simulations), also run from the repository root. Raw result lines:
 `tier?-results.txt`; logs `v_tier?.log`.
 
+The development build of 2026-11-19, made after 0.2.0, was released as version 0.2.1 on
+2026-11-20. The last two sections record the build and the release; every tier was rerun
+on the 0.2.1 library.
+
 The difference-in-differences route, ported on 2026-11-13 and released as version 0.2.0,
-is validated in the last two sections, with scripts and result files of its own
+is validated in the two sections dated 2026-11-13, with scripts and result files of its own
 (`v_did_tier?.do`, `did-tier?-results.txt`): A 31/31, B 225/225, C 235/235, D 53/53
 PASS against version 1.12.0 of the R package. The four tiers below were rerun on the
 0.2.0 library; their result files are byte-identical, and their logs differ only in
@@ -862,3 +866,132 @@ Everything was rerun on this library, from the repository root:
 Run times with three to four jobs at a time: Tier A 17 min, B 1 min, C 2 min, D 22 min;
 the route's tiers A 10 min, B and C under a minute each, D 24 min; `run-tests.do` 9 min;
 the two R scripts 44 min together.
+
+## 2026-11-19 development build after 0.2.0: `rho` given the covariates in `didpilot`, and a warning for few units in one group
+
+Not a release: the version strings still say 0.2.0, and `powerape.ado` is the released
+file. The library was rebuilt from changed Mata sources (`lpowerape.mlib` md5
+62a94b21b48dab526d4396ef4db72b86; the released 0.2.0 library is 2174e138...), so the
+version line at the top of every log below reads 0.2.0 although the library is this
+build.
+
+What changed, all of it in the difference-in-differences route:
+
+* **`powerape dgp NAME, didpilot` with `covariates()`.** In these designs `rho()` is the
+  dependence between a unit's outcomes that is left given the covariates; covariates are
+  constant over time and add dependence of their own. The pairs of outcomes in a pilot
+  show the whole dependence, and 0.2.0 used that raw value together with the covariates,
+  which counted part of the dependence twice. With covariates and a positive signal the
+  command now solves for the `rho()` at which the design, averaged over its covariate
+  draws, has the pilot's share of pairs with the outcome in both periods (`binormal()`).
+  `r(pilot)` gains a tenth column, `rho_raw`; the design print and the methods paragraph
+  say "given the covariates" for designs with covariates. Without covariates, with
+  `signal(0)`, or with `rho()` given, nothing changes.
+* **A warning for few units in one group.** `power`, `curve`, `n`, `mde` and `robust` warn
+  when fewer than 30 units are expected in the smaller group (repeated cross-sections:
+  fewer than 30 observations in the smallest group-by-before/after cell; with a subgroup:
+  the smallest group-by-subgroup cell). Robust and cluster-robust standard errors are too
+  small there. The warning is a printed line; no estimate, standard error or stored result
+  changes.
+* The help file (the meaning of `rho()`, a corrected sentence about `signal()` and the
+  linear panel analysis, the `didpilot` paragraph, the coverage section).
+
+Rerun on this build, from the repository root (StataNow/SE 19.5, update 14 Oct 2026):
+
+* **The routes that existed before, and seeded results of the route.**
+  `tests/did_port_identity_2026-11-13.do`: all 290 lines (288 seeded numbers in `%21x`
+  and two printed statements) are byte-identical to the file written under 0.2.0. Tiers A
+  to D: 12/12, 171/171, 30/30 and 45/45 PASS; every `tier?-results.txt` and every
+  `v_tier?.log` is byte-identical to the committed file.
+* **The difference-in-differences route.** Tiers A to D: 31/31, 225/225, 235/235 and
+  53/53 PASS; every `did-tier?-results.txt` is byte-identical to the committed file, and
+  so are the logs of tiers A, B and D. `v_did_tierC.log` differs in five lines, each the
+  line of a design print that now ends "given the covariates"; no number in it changed.
+  No tier design falls under the new rule (the warning is printed under `nodisplay`
+  too), so no log gained a line.
+* **Regression tests.** `tests/run-tests.do`: 209 PASS, 0 FAIL (the 196 of 0.2.0 and 13
+  new: five read the warning back from a log for a panel, repeated cross-sections, groups
+  of one size, the curve and the sweep; eight cover the pilot builder with covariates,
+  among them the probit closed form (raw - signal)/(1 - signal), no conversion without
+  signal or with `rho()` given, and a signal too strong for the pilot). The first run of
+  the suite on this build stopped with r(110) at the first new warning check, because the
+  check reused the name of a design from an earlier section; that was a mistake in the
+  test file, not an error of the command. The name was changed and the suite rerun in
+  full; the count above is that run.
+* **The pilot builder against R.** One pilot file (20,000 units, two periods, a probit
+  world with `rho` .20 given a covariate and signal .30) read by both languages, six
+  specifications (probit and logit at signals .15 and .30; a covariate correlated with the
+  group; a normal and a binary covariate): the raw correlation agrees to 4e-16 and the
+  `rho` given the covariates to .00026 at most (R .19262, Stata .19287 under probit at
+  signal .30; the two languages draw their integration samples from different
+  random-number streams). In a second pilot of 60,000 units the probit value is within
+  .005 of the closed form.
+* **Rebuilds.** The sweep rebuilds every scenario from the design's stored options, which
+  are written after the conversion: for a pilot-built design with a covariate, the
+  sweep's base scenario equals a direct run of that design at the scenario's seed (power
+  .4333 and .4333, 300 studies), and the same design with the raw correlation as `rho()`
+  gives .4800 there.
+
+Not rerun on this build: `examples/showcase.do`, the scratch `net install`, and the two R
+scripts of the route (`did_export_fixtures.R`, `did_tierD_r.R`), so the files in
+`validation/data/` are the ones the 2026-11-13 sections describe.
+
+The R side. The same two changes were made in the working tree of the R package on the
+same day (not committed there either), in code this time and not only in comments: of the
+eleven R sources whose checksums the 2026-11-13 section pins, eight now differ in code
+from the pinned files (`did.R`, `did-subgroup.R`, `did-pilot.R`, `did-statement.R`,
+`engine.R`, `curve.R`, `mde.R`, `robust.R`); `linear.R`, `alpha.R` and `ape-math.R` do
+not. The pin stays true for the commit it names (8a54008). On the R side the seeded results of six existing designs were compared between
+the released sources and the changed tree: 31 results identical, four differing only by
+the words "given the covariates", none otherwise; the one intended change is the `rho` of
+a pilot-built design with covariates.
+
+Run times are not comparable with the earlier sections: the jobs ran four to five at a
+time beside an R package check (about three hours in all).
+
+## 2026-11-20 version 0.2.1: the build of 2026-11-19 released
+
+Version 0.2.1 is the library of the previous section with the version strings changed
+and nothing else: `powerape.ado` (the constant and the `*!` lines), `pape_version()` in
+`powerape_search.mata` (now "0.2.1 (Stata port of powerape 1.12.1)"), the header comment
+of `powerape_did.mata`, the help file, the package file (Distribution-Date 20261120) and
+the showcase header. The help file, the package file and the README gain a paragraph on
+the version. `build.do` rebuilt `lpowerape.mlib` (`powerape.ado` md5
+f309bb799c87b32b21592ec54be3e6b0 as the repository stores it, `lpowerape.mlib` md5
+47e394baa0fa16068f5bec49a0a06271; StataNow/SE 19.5, update 14 Oct 2026), and
+`powerape version` reports that the ado-file and the library agree. The R package has the
+same two changes from its version 1.12.1, so the command now names that version.
+
+Everything was rerun on this library, from the repository root:
+
+* **The routes that existed before.** `tests/did_port_identity_2026-11-13.do`: the 288
+  seeded numbers are byte-identical to the file written under 0.2.0; the two printed
+  statements differ only in the version they name. Tiers A to D: 12/12, 171/171, 30/30
+  and 45/45 PASS; every `tier?-results.txt` is byte-identical to the 0.2.0 file, and
+  every `v_tier?.log` differs from it in one line, the version line.
+* **The difference-in-differences route.** The two R scripts were rerun with the R
+  package at 1.12.1 (`did_tierD_r.log` now says so): every file in `validation/data/` is
+  byte-identical to the one the 2026-11-13 sections used. Tiers A to D of the route:
+  31/31, 225/225, 235/235 and 53/53 PASS; every `did-tier?-results.txt` is
+  byte-identical to the 0.2.0 file. The logs of tiers A, B and D differ from the 0.2.0
+  logs in the version line only; `v_did_tierC.log` also has the five design-print lines
+  of the previous section.
+* **Regression tests and packaging.** `tests/run-tests.do`: 209 PASS, 0 FAIL.
+  `examples/showcase.do` runs without an error and prints version 0.2.1. A scratch
+  `net install` (PLUS and PERSONAL redirected) gives version 0.2.1 with the ado-file and
+  the library in agreement, runs a difference-in-differences design under both engines,
+  copies the two ancillary files with `net get`, compiles the library with `build.do` in
+  a copy of the repository, and uninstalls: 5/5 PASS.
+
+Not rerun for 0.2.1: the comparison of the pilot builder with R on one pilot file and the
+check of the sweep's rebuild, both described in the previous section. They ran on the
+library of 2026-11-19, which differs from this one in the version strings only.
+
+The R references. `did_export_fixtures.R` and `did_tierD_r.R` now run on version 1.12.1
+of the R package. Its sources differ from the ones the 2026-11-13 section pins in the
+eight files the previous section lists, and the reference files they write are the same
+byte for byte.
+
+Run times with up to five jobs at a time: Tier A 12 min, B and C about a minute each,
+D 15 min; the route's tiers A 10 min, B and C under a minute each, D 29 min;
+`run-tests.do` 6 min; the two R scripts 16 and 20 min.

@@ -29,6 +29,23 @@ string scalar pape_numlist(real rowvector x)
 // Printing a design
 // ---------------------------------------------------------------------------
 
+// 1 when the pilot's rho was solved given the design's covariates
+real scalar pape_did_pilot_converted(struct pape_dgp scalar x)
+{
+    if (cols(x.pilot) < 10) return(0)
+    if (x.pilot[10] == . | x.pilot[8] == .) return(0)
+    if (strpos(" " + x.pilot_over + " ", " rho ")) return(0)
+    return(abs(x.pilot[8] - x.pilot[10]) > 1e-12)
+}
+
+// what rho is, as named in the design print and the methods paragraph: with
+// covariates that move the outcome, the latent correlation given them
+real scalar pape_did_cov_dep(struct pape_dgp scalar x)
+{
+    if (x.k == 0) return(0)
+    return(x.s2 > 0)
+}
+
 string scalar pape_did_pilot_line(struct pape_dgp scalar x)
 {
     string rowvector est
@@ -41,10 +58,12 @@ string scalar pape_did_pilot_line(struct pape_dgp scalar x)
     if (x.pilot[8] != . & !strpos(" " + x.pilot_over + " ", " rho ")) est = est, "rho"
     s = ""
     for (j = 1; j <= cols(est); j++) s = s + (j > 1 ? ", " : "") + est[j]
-    return(sprintf("  pilot: %s estimated from %f pre-treatment rows%s%s", s, x.pilot[1],
+    return(sprintf("  pilot: %s estimated from %f pre-treatment rows%s%s%s", s, x.pilot[1],
         (x.pilot[2] == . ? "" : sprintf(" (%f units)", x.pilot[2])),
         (x.pilot[9] == . ? "" : sprintf("; control group's change between pilot periods %s",
-            (x.pilot[9] >= 0 ? "+" : "") + strtrim(sprintf("%12.3f", x.pilot[9]))))))
+            (x.pilot[9] >= 0 ? "+" : "") + strtrim(sprintf("%12.3f", x.pilot[9])))),
+        (pape_did_pilot_converted(x) ? sprintf("; rho given the covariates %5.3f (raw within-unit correlation %5.3f)",
+            x.pilot[8], x.pilot[10]) : "")))
 }
 
 void pape_print_did_dgp(struct pape_dgp scalar x)
@@ -61,8 +80,9 @@ void pape_print_did_dgp(struct pape_dgp scalar x)
     printf("{txt}powerape DGP -- %s, difference-in-differences%s (%s)\n", x.model,
         (x.has_sub ? " with a subgroup" : ""), per)
     if (panel)
-        dat = sprintf("panel, %s per unit; rho = %4.2f (latent within-unit correlation); unit-clustered SEs",
-            (two ? "both periods" : sprintf("all %f periods", x.n_periods)), x.rho)
+        dat = sprintf("panel, %s per unit; rho = %4.2f (latent within-unit correlation%s); unit-clustered SEs",
+            (two ? "both periods" : sprintf("all %f periods", x.n_periods)), x.rho,
+            (pape_did_cov_dep(x) ? " given the covariates" : ""))
     else
         dat = sprintf("repeated cross-sections, %1.0f%% of observations in the post %s",
             100 * x.p_post, (two ? "period" : "periods"))
@@ -174,7 +194,7 @@ void pape_did_rreturn(struct pape_dgp scalar d)
     if (cols(d.pilot) > 0) {
         tv = d.pilot
         st_matrix("pape_r_pilot", tv)
-        st_matrixcolstripe("pape_r_pilot", (J(9, 1, ""), ("n_rows" \ "n_units" \ "n_periods" \ "n_pairs" \ "baseline" \ "gap" \ "p_treated" \ "rho" \ "control_change")))
+        st_matrixcolstripe("pape_r_pilot", (J(10, 1, ""), ("n_rows" \ "n_units" \ "n_periods" \ "n_pairs" \ "baseline" \ "gap" \ "p_treated" \ "rho" \ "control_change" \ "rho_raw")))
     }
 }
 
@@ -304,6 +324,75 @@ real scalar pape_did_pilot_rho(real colvector p, real colvector m, real colvecto
     return(pape_uniroot(&pape_f_pilot_rho(), e, 0, 0.995, 0, 1e-9))
 }
 
+// The same moment condition for a design with covariates. Covariates are
+// constant over time, so they are a second source of dependence between a
+// unit's outcomes, and the design's rho is the latent correlation that is
+// left GIVEN the covariates. The raw pairs of the pilot show the whole
+// dependence, so the rho to use is the one at which the design's joint rate,
+// averaged over the covariate index q of each group, equals the pilot's.
+
+// an equally weighted grid standing in for the draws of q: quantile
+// midpoints (R's quantile(), type 7)
+real colvector pape_did_q_grid(real colvector q, real scalar K)
+{
+    real colvector s, h, lo, hi
+    real scalar n
+    n = rows(q)
+    if (n <= K) return(q)
+    s = sort(q, 1)
+    h = (n - 1) :* (((1::K) :- 0.5) :/ K) :+ 1
+    lo = floor(h); hi = ceil(h)
+    return(s[lo] :+ (h :- lo) :* (s[hi] :- s[lo]))
+}
+
+// P(Y_s = 1, Y_t = 1) for two periods of one unit whose rate is G(cc + q),
+// averaged over the values q, at latent correlation rho given q
+real scalar pape_did_joint_rate_cov(string scalar link, real scalar cc, real colvector q,
+    real scalar rho)
+{
+    real colvector p, thr
+    p = pape_G(link, cc :+ q)
+    if (rho <= 0) return(mean(p:^2))
+    p = (p :< 1e-15) :* 1e-15 :+ (p :>= 1e-15) :* p
+    p = (p :> 1 - 1e-15) :* (1 - 1e-15) :+ (p :<= 1 - 1e-15) :* p
+    thr = invnormal(p)
+    return(mean(binormal(thr, thr, J(rows(thr), 1, rho))))
+}
+
+// e.idxz, e.x_c: the covariate index of the control and of the treated
+// group; e.b0, e.bf: their intercepts; e.p, e.r: their numbers of pairs;
+// e.s, e.t: their observed joint rates
+real scalar pape_f_pilot_rho_cov(real scalar rho, struct pape_env scalar e)
+{
+    real scalar v
+    v = 0
+    if (e.p > 0) v = v + e.p * (pape_did_joint_rate_cov(e.link, e.b0, e.idxz, rho) - e.s)
+    if (e.r > 0) v = v + e.r * (pape_did_joint_rate_cov(e.link, e.bf, e.x_c, rho) - e.t)
+    return(v)
+}
+
+// rho given the covariates; the group intercepts are solved at the pilot's
+// own rates. exceeds = 1 when the covariates alone already imply at least
+// the dependence the pilot shows (then rho = 0)
+real scalar pape_did_pilot_rho_cov(string scalar link, real colvector p, real colvector m,
+    real colvector w, real colvector q0, real colvector q1, real scalar exceeds)
+{
+    struct pape_env scalar e
+    e.link = link
+    e.idxz = pape_did_q_grid(q0, 2000)
+    e.x_c = pape_did_q_grid(q1, 2000)
+    e.b0 = pape_did_solve(link, e.idxz, p[1], 0)
+    e.bf = pape_did_solve(link, e.x_c, p[2], 0)
+    e.p = w[1]; e.r = w[2]; e.s = m[1]; e.t = m[2]
+    exceeds = 0
+    if (pape_f_pilot_rho_cov(0, e) >= 0) {
+        exceeds = 1
+        return(0)
+    }
+    if (pape_f_pilot_rho_cov(0.995, e) <= 0) return(0.995)
+    return(pape_uniroot(&pape_f_pilot_rho_cov(), e, 0, 0.995, 0, 1e-9))
+}
+
 // estimates baseline, gap, the treated share and (panel) rho from the data
 // in memory, then builds the design; *_given flags mark user overrides
 void pape_cmd_dgp_didpilot(string scalar name, string scalar yvar, string scalar gvar,
@@ -323,7 +412,8 @@ void pape_cmd_dgp_didpilot(string scalar name, string scalar yvar, string scalar
     real matrix info, Cm
     real rowvector baseline, gap, trend
     real scalar panel, p0, p1, n_units, n_pairs, rho_hat, pt_hat, ctrl_change, n_per, j, k
-    real scalar p_treated, rho
+    real scalar p_treated, rho, rho_raw, exceeds
+    real colvector q00, q01, q10, q11
     string scalar design, over
     y = st_data(., yvar, touse)
     g = st_data(., gvar, touse)
@@ -405,9 +495,21 @@ void pape_cmd_dgp_didpilot(string scalar name, string scalar yvar, string scalar
         trends, analysis, n_pre, n_post, 0, sv,
         pape_vars_parse(cnames, ctypes, cps, cmeans, csds, ciccs), corr_kind, corr_scalar, Cm,
         signal, rows(gamma) > 0, gamma, n_int, seed_int)
+    // covariates add within-unit dependence of their own: the design's rho
+    // is the part left given them. The calibration does not depend on rho,
+    // so the design is updated in place.
+    rho_raw = rho_hat
+    if (rho_hat != . & rho_in == . & d.design == "panel" & d.k > 0 & d.s2 > 0) {
+        pape_did_qsplit(d, q00, q01, q10, q11)
+        rho_hat = pape_did_pilot_rho_cov(d.link, (p0 \ p1), m, w, q00, q10, exceeds)
+        if (exceeds)
+            printf("{err}warning: the covariates as specified imply more within-unit dependence than the pilot shows (its raw latent correlation is %5.3f): rho given the covariates is set to 0, and the design still has more dependence than the pilot. The stated signal looks too high for these data.\n", rho_raw)
+        rho = rho_hat
+        d.rho = rho
+    }
     d.spec_opts = pape_did_spec(model, baseline, gap, trend, p_treated, design, rho, p_post,
         trends, analysis, n_pre, n_post, "", ., covraw, corrraw, signal, gamma_str, n_int, seed_int)
-    d.pilot = (rows(y), n_units, n_per, n_pairs, p0, p1 - p0, pt_hat, rho_hat, ctrl_change)
+    d.pilot = (rows(y), n_units, n_per, n_pairs, p0, p1 - p0, pt_hat, rho_hat, ctrl_change, rho_raw)
     d.pilot_over = strtrim(over)
     pape_put_dgp(d)
     if (display) pape_print_dgp(d)
@@ -435,7 +537,8 @@ string scalar pape_did_pilot_clause(struct pape_dgp scalar d)
     if (!strpos(" " + d.pilot_over + " ", " baseline ")) lab = lab, "the control group's rate before treatment"
     if (!strpos(" " + d.pilot_over + " ", " gap ")) lab = lab, "the gap between the groups"
     if (!strpos(" " + d.pilot_over + " ", " ptreated ")) lab = lab, "the treated share"
-    if (d.pilot[8] != . & !strpos(" " + d.pilot_over + " ", " rho ")) lab = lab, "the within-unit correlation"
+    if (d.pilot[8] != . & !strpos(" " + d.pilot_over + " ", " rho "))
+        lab = lab, (pape_did_pilot_converted(d) ? "the within-unit correlation given the covariates" : "the within-unit correlation")
     if (cols(lab) == 0) return("")
     if (cols(lab) == 1) s = lab[1]
     else {
@@ -456,7 +559,8 @@ string scalar pape_describe_did(struct pape_dgp scalar d)
     panel = (d.design == "panel")
     s_design = sprintf("a difference-in-differences design with a treated group (%1.0f%% of the %s) and a control group, observed in %s before and %s after one common treatment date",
         100 * d.p_treated, (panel ? "units" : "observations"), pape_did_nper(d.n_pre), pape_did_nper(d.n_post))
-    if (panel) s_data = sprintf("as a panel of the same units, with a latent within-unit correlation of %4.2f shared by all periods (Gaussian copula)", d.rho)
+    if (panel) s_data = sprintf("as a panel of the same units, with a latent within-unit correlation of %4.2f%s shared by all periods (Gaussian copula)", d.rho,
+        (pape_did_cov_dep(d) ? " given the covariates," : ""))
     else s_data = sprintf("as repeated cross-sections, with %1.0f%% of the observations after the treatment date", 100 * d.p_post)
     if (d.has_sub) {
         nm = d.subgroup.name
@@ -639,7 +743,13 @@ void pape_cmd_robust_did(string scalar dname, real scalar n, string scalar claim
     real matrix grid, scen, cand_tab, L, out
     real colvector key, crit, ok_idx, cr, o, cand, nn, nl, valid, est_mean
     real scalar nv, j, i, G, rc, rule_on, worst_i, nmax_i, k, sk, dist, best_j, world, jt
+    struct pape_dgp scalar few_d
+    real scalar few_min, fcnt
+    string scalar fcell
     dgp = pape_get_dgp(dname)
+    // the smallest group over the base design and the scenarios
+    few_min = pape_did_few_units(dgp, n, fcell)
+    few_d = dgp
     // the base design must be analysed on the scale its trends are parallel
     // on; the other scale is a scenario (vary(trends(index linear)))
     pape_did_need_valid(dgp, "powerape robust")
@@ -740,6 +850,11 @@ void pape_cmd_robust_did(string scalar dname, real scalar n, string scalar claim
         }
         d_i = pape_get_dgp("_pape_scn")
         valid[i] = pape_did_valid(d_i)
+        fcnt = pape_did_few_units(d_i, n, fcell)
+        if (fcnt < few_min) {
+            few_min = fcnt
+            few_d = d_i
+        }
         if (mode == "mde") {
             // a subgroup design must be pinned before its effect is searched
             if (dgp.has_sub) {
@@ -779,6 +894,11 @@ void pape_cmd_robust_did(string scalar dname, real scalar n, string scalar claim
         if (dist <= 0 & any(pw.draws.ok)) crit[i] = 1e300
     }
     pape_set_quiet(0)
+    // few independent units behind one group, in the base design or in a
+    // scenario (the treated share may be varied): one warning, for the
+    // smallest such group
+    if (few_min != .)
+        pape_did_few_warning(few_d, n, sprintf("At n = %f, in the scenario with the smallest group", n))
     key = (mode == "mde" ? abs(scen[., nv + 1]) : scen[., nv + 2])
     ok_idx = selectindex((key :!= .) :& valid)
     if (rows(ok_idx) == 0 | cols(ok_idx) == 0) pape_err("No scenario was feasible; widen or shift the vary() ranges.")

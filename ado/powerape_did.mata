@@ -8,7 +8,7 @@
 *! (ATT = average partial effect of the treatment indicator over the treated
 *! post-period rows) or by a linear probability model (OLS). Mirrors R/did.R,
 *! R/did-subgroup.R, R/did-statement.R, R/did-pilot.R and the OLS part of
-*! R/ape-math.R of the powerape R package 1.12.0.
+*! R/ape-math.R of the powerape R package 1.12.1.
 version 16
 mata:
 mata set matastrict on
@@ -93,6 +93,75 @@ void pape_did_power_only(struct pape_dgp scalar d, string scalar what)
 // and their subgroup counterparts): the range of the Hauck-Donner backup
 real scalar pape_did_last_col(struct pape_dgp scalar d)
     return(d.has_sub ? 2 * d.n_periods + 4 : d.n_periods + 2)
+
+// ---------------------------------------------------------------------------
+// Few independent units behind one group (did.R: did_few_units)
+// ---------------------------------------------------------------------------
+// Robust and cluster-robust standard errors tend to be too small when one
+// group has few independent units, whatever the number of rows per unit.
+// The guards on cell events (pape_sparse_warning) and on the total number
+// of units (pape_power_once) do not see a small group that is observed in
+// several periods.
+
+// The smallest expected number of independent units behind a group at
+// design size n: units of the smaller group in a panel, observations of the
+// smallest group-by-before/after cell in repeated cross-sections; with a
+// subgroup, of the smallest group-by-subgroup cell. Missing for other
+// designs, at 30 or more, and for a panel with fewer than 30 units in all
+// (pape_power_once warns there); cell: the group's name for the warning.
+real scalar pape_did_few_units(struct pape_dgp scalar d, real scalar n, string scalar cell)
+{
+    real colvector sh
+    string colvector lab
+    real scalar panel, pt, ps, p11, i, j
+    cell = ""
+    if (d.route != "did") return(.)
+    panel = (d.design == "panel")
+    if (panel) {
+        if (n < 30) return(.)
+    }
+    pt = d.p_treated
+    if (d.has_sub) {
+        ps = d.subgroup.p
+        // P(treated, subgroup = 1) under the copula
+        p11 = binormal(-invnormal(1 - pt), -invnormal(1 - ps), d.R[1, 2])
+        sh = (1 - pt - ps + p11 \ ps - p11 \ pt - p11 \ p11)
+        lab = (sprintf("the control group with %s = 0", d.subgroup.name) \
+               sprintf("the control group with %s = 1", d.subgroup.name) \
+               sprintf("the treated group with %s = 0", d.subgroup.name) \
+               sprintf("the treated group with %s = 1", d.subgroup.name))
+    }
+    else {
+        sh = (1 - pt \ pt)
+        lab = ("the control group" \ "the treated group")
+    }
+    if (!panel) {
+        sh = (sh :* (1 - d.p_post) \ sh :* d.p_post)
+        lab = (lab :+ " before the treatment date" \ lab :+ " after the treatment date")
+    }
+    i = 1
+    for (j = 2; j <= rows(sh); j++) {
+        if (sh[j] < sh[i]) i = j
+    }
+    if (n * sh[i] >= 30) return(.)
+    cell = lab[i]
+    // groups (cells) of one size: name them all
+    if (!d.has_sub) {
+        if (max(sh) - min(sh) < 1e-12) cell = (panel ? "each group" : "each group-by-before/after cell")
+    }
+    return(n * sh[i])
+}
+
+void pape_did_few_warning(struct pape_dgp scalar d, real scalar n, string scalar where)
+{
+    string scalar cell
+    real scalar cnt
+    cnt = pape_did_few_units(d, n, cell)
+    if (cnt == .) return
+    printf("{err}warning: %sabout %s %s are expected in %s; robust and cluster-robust standard errors tend to be too small with so few independent units behind one group (most when the other group is much larger), a true zero effect is then declared significant more often than alpha, and the reported power contains that excess. See help powerape, section 'Interval coverage in small samples'.\n",
+        (where != "" ? where + ": " : ""), (cnt < 1 ? "fewer than 1" : strofreal(round(cnt))),
+        (d.design == "panel" ? "units" : "observations"), cell)
+}
 
 // ---------------------------------------------------------------------------
 // Calibration

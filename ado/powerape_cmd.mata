@@ -366,6 +366,7 @@ void pape_cmd_power(string scalar dname, real scalar n, string scalar claim,
     d = pape_get_dgp(dname)
     r = pape_power_once(d, n, claim, sesoi, conf, nsim, seed, 1, se, alpha, rule, keep_draws, separation)
     (void) pape_sparse_warning(r.separated, r.min_cell, separation, "", pape_cell_code(d, r.estimand == "aie"))
+    pape_did_few_warning(d, n, "")
     pape_store_put("RES", resname, r)
     if (display) pape_print_power(r)
     pape_res_rreturn(r, resname)

@@ -1,6 +1,6 @@
 
 . di as txt "powerape `pav'; Stata `c(stata_version)' (`c(born_date)')"
-powerape 0.2.0 (Stata port of powerape 1.12.0); Stata 19.5 (14 Oct 2026)
+powerape 0.2.1 (Stata port of powerape 1.12.1); Stata 19.5 (14 Oct 2026)
 
 . import delimited data/did-reference.csv, clear varnames(1) stringcols(1 2) as
 > double
@@ -217,7 +217,7 @@ true effects on the treated of DGP c5 on the integration set:           .1 (fem
 . calcheck c6 1 1e-2 2e-3 "integration draw, nint 4e5"
 powerape DGP -- logit, difference-in-differences (two periods)
   data: panel, both periods per unit; rho = 0.40 (latent within-unit correlatio
-> n); unit-clustered SEs
+> n given the covariates); unit-clustered SEs
   analysis: pooled logit; ATT = average partial effect of the treatment indicat
 > or over treated post-period rows
   treated group: 50% of units
@@ -236,7 +236,7 @@ true ATT of DGP c6 on the integration set:          .07
 . powerape describe c6
 powerape DGP -- logit, difference-in-differences (two periods)
   data: panel, both periods per unit; rho = 0.40 (latent within-unit correlatio
-> n); unit-clustered SEs
+> n given the covariates); unit-clustered SEs
   analysis: pooled logit; ATT = average partial effect of the treatment indicat
 > or over treated post-period rows
   treated group: 50% of units
@@ -267,7 +267,7 @@ powerape DGP -- logit, difference-in-differences (two periods)
 . calcheck c7 1 1e-2 2e-3 "integration draw, nint 4e5"
 powerape DGP -- probit, difference-in-differences (two periods)
   data: panel, both periods per unit; rho = 0.00 (latent within-unit correlatio
-> n); unit-clustered SEs
+> n given the covariates); unit-clustered SEs
   analysis: pooled probit; ATT = average partial effect of the treatment indica
 > tor over treated post-period rows
   treated group: 50% of units
@@ -294,7 +294,7 @@ true ATT of DGP c7 on the integration set:          .07
 . calcheck c6big 1 3e-3 6e-4 "integration draw, nint 4e6"
 powerape DGP -- logit, difference-in-differences (two periods)
   data: panel, both periods per unit; rho = 0.40 (latent within-unit correlatio
-> n); unit-clustered SEs
+> n given the covariates); unit-clustered SEs
   analysis: pooled logit; ATT = average partial effect of the treatment indicat
 > or over treated post-period rows
   treated group: 50% of units
@@ -319,7 +319,7 @@ true ATT of DGP c6big on the integration set:          .07
 . calcheck c8 2 1e-2 2e-3 "integration draw, nint 4e5"
 powerape DGP -- logit, difference-in-differences with a subgroup (two periods)
   data: panel, both periods per unit; rho = 0.50 (latent within-unit correlatio
-> n); unit-clustered SEs
+> n given the covariates); unit-clustered SEs
   analysis: pooled logit, fully interacted with female; estimate = difference o
 > f the two subgroups' average partial effects of treatment
   treated group: 50% of units; subgroup female = 1: 40%
