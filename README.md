@@ -154,7 +154,7 @@ with R and with `logit`/`probit` + `margins`, `regress`, `didregress` and
 `xtdidregress`; Tier C compares the calibration constants; Tier D compares
 simulated power, rejection rates, sample sizes, detectable effects, sweeps
 and justified alpha. Their R references (`did_export_fixtures.R`,
-`did_tierD_r.R`) were run with version 1.12.1 of the R package (the route
+`did_tierD_r.R`) were run with version 1.12.2 of the R package (the route
 exists from 1.12.0); `did_export_fixtures.R` also reads a test helper from the
 package's source tree, so set the environment variable `POWERAPE_R_DEV` to a
 clone of the R package before running them. Tier B takes about a minute, Tier C two, Tier A about
@@ -162,6 +162,16 @@ ten and Tier D about 25 minutes.
 
 ## Version history
 
+* 0.2.2 (2026-11-20): a difference-in-differences design whose two
+  parallel-trends scales coincide (`gap(0)` or `trend(0)`, and no
+  covariates that move the outcome) is valid under either analysis: it
+  reports power and can be searched, where 0.2.1 called it a mismatch. The
+  note for a mismatched design with covariates says that the analysis
+  centres near, not on, the covariate-free reading. `ppost()` on a panel
+  gives a warning; `didpilot` with `id()` and `design(cross-sections)` no
+  longer warns about a `rho()` that was not given. Results of designs that
+  were valid before are bit-identical to 0.2.1. The command now follows the
+  R package powerape 1.12.2.
 * 0.2.1 (2026-11-20): `powerape dgp ..., didpilot` with `covariates()`
   returns the `rho()` given the covariates. In a difference-in-differences
   design `rho()` is the dependence between a unit's outcomes that is left

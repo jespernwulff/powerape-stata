@@ -795,7 +795,7 @@ string scalar pape_claim_text(string scalar claim, real scalar sesoi, real scala
     return(sprintf("the equivalence claim (the %s confidence interval lying within +/-%5.3f; two one-sided tests at alpha = %s%s)", cl, sesoi, al_txt, by_n))
 }
 
-string scalar pape_version() return("0.2.1 (Stata port of powerape 1.12.1)")
+string scalar pape_version() return("0.2.2 (Stata port of powerape 1.12.2)")
 
 string scalar pape_statement(struct pape_res scalar x)
 {

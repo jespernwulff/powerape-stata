@@ -8,7 +8,7 @@
 *! (ATT = average partial effect of the treatment indicator over the treated
 *! post-period rows) or by a linear probability model (OLS). Mirrors R/did.R,
 *! R/did-subgroup.R, R/did-statement.R, R/did-pilot.R and the OLS part of
-*! R/ape-math.R of the powerape R package 1.12.1.
+*! R/ape-math.R of the powerape R package 1.12.2.
 version 16
 mata:
 mata set matastrict on
@@ -27,7 +27,40 @@ real scalar pape_did_linear(struct pape_dgp scalar d)
 
 // an analysis is valid in the simulated world exactly when it assumes the
 // scale on which the world's untreated trends are parallel
-real scalar pape_did_valid(struct pape_dgp scalar d) return(d.trends == d.analysis)
+real scalar pape_did_valid(struct pape_dgp scalar d)
+{
+    return(d.trends == d.analysis | pape_did_coincide(d))
+}
+
+// Without a gap between the groups before treatment, or without a change in
+// the control group, "parallel" means the same on the index and on the
+// probability scale, so both analyses are valid in both worlds. Used only
+// when no covariate moves the outcome (with a subgroup: in each subgroup).
+real scalar pape_did_coincide(struct pape_dgp scalar d)
+{
+    if (d.route != "did") return(0)
+    if (cols(d.did_gap) == 0 | cols(d.did_trend) == 0) return(0)
+    if (d.s2 != 0) return(0)
+    return(all((d.did_gap :== 0) :| (d.did_trend :== 0)))
+}
+
+// the note under the design print when world and analysis name different scales
+void pape_did_scale_note(struct pape_dgp scalar x, string scalar what)
+{
+    if (x.trends == x.analysis) return
+    if (pape_did_coincide(x)) {
+        printf("  note: with %s, parallel trends mean the same on both scales, so the analysis is valid for this design\n",
+            (all(x.did_gap :== 0) ? "no gap between the groups before treatment" :
+             (all(x.did_trend :== 0) ? "no change in the control group" :
+              "no gap between the groups or no change in the control group in each subgroup")))
+    }
+    else if (x.analysis != "linear" & x.s2 > 0) {
+        printf("  note: the analysis assumes index-parallel trends, so it centres near that covariate-free reading (not exactly on it, because the design has covariates), not on %s\n", what)
+    }
+    else {
+        printf("  note: the analysis assumes %s-parallel trends, so it centres on that reading, not on %s\n", x.analysis, what)
+    }
+}
 
 // designs whose n counts units observed over several periods
 real scalar pape_unit_design(struct pape_dgp scalar d)
@@ -272,6 +305,10 @@ struct pape_dgp scalar pape_dgp_did(string scalar name, string scalar model,
     if (n_pre == . | n_pre < 1 | n_pre != round(n_pre) | n_post == . | n_post < 1 | n_post != round(n_post))
         pape_err("npre() and npost() must be whole numbers of at least 1.")
     if (n_int == . | n_int < 1e4) pape_err("nint() must be at least 10000.")
+    if (design == "panel" & p_post != .) {
+        printf("{err}warning: ppost() is ignored for design(panel): every unit is observed in every period.\n")
+        p_post = .
+    }
     d.p_post_given = (p_post != .)
     if (p_post == .) p_post = n_post / (n_pre + n_post)
     if (p_post <= 0 | p_post >= 1) pape_err("ppost() must lie strictly between 0 and 1.")

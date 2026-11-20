@@ -5,7 +5,7 @@
 v 3
 d 'POWERAPE': module for power analysis for average partial effects (APE) and average interaction effects (AIE)
 d
-d powerape is a Stata port of the R package powerape (version 1.12.1,
+d powerape is a Stata port of the R package powerape (version 1.12.2,
 d https://github.com/jespernwulff/powerape): simulation-based power analysis
 d in which the effect size of interest is the average partial effect or the
 d average interaction effect of a probit or logit model, stated in probability
@@ -27,6 +27,12 @@ d library compiled by a newer Stata may not load in an older one, so on Stata
 d 16-18 rebuild it from the .mata sources (net get powerape, then do build.do)
 d and run mata: mata mlib index. After installing, run -powerape version- to
 d check that the ado-file and the Mata library match.
+d
+d Version 0.2.2 (20 November 2026): a difference-in-differences design
+d whose two parallel-trends scales coincide (gap(0) or trend(0), no
+d covariates that move the outcome) is valid under either analysis; notes
+d and warnings corrected. Results of designs that were valid before are
+d identical to 0.2.1.
 d
 d Version 0.2.1 (20 November 2026): dgp NAME, didpilot with covariates()
 d returns the rho() given the covariates (0.2.0 used the pilot's raw

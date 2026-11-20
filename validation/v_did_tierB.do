@@ -4,7 +4,7 @@
 * delta-method Jacobian, HC0 / cluster sandwiches, OLS with HC1 / cluster
 * variances) and against Stata's own commands (logit/probit + margins,
 * regress, didregress, xtdidregress). Reference values come from
-* validation/did_export_fixtures.R, run on version 1.12.1 of the R package.
+* validation/did_export_fixtures.R, run on version 1.12.2 of the R package.
 * Run from the repository root (the folder that holds ado/ and validation/):
 *     do validation/v_did_tierB.do
 * Writes validation/did-tierB-results.txt and the log validation/v_did_tierB.log.

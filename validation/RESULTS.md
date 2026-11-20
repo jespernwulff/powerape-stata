@@ -14,8 +14,10 @@ Reference values come from `export_fixtures.R` (fixed datasets and R internals) 
 `tier?-results.txt`; logs `v_tier?.log`.
 
 The development build of 2026-11-19, made after 0.2.0, was released as version 0.2.1 on
-2026-11-20. The last two sections record the build and the release; every tier was rerun
-on the 0.2.1 library.
+2026-11-20. The sections of 2026-11-19 and "2026-11-20 version 0.2.1" record the build
+and the release; every tier was rerun on the 0.2.1 library. Version 0.2.2 of the
+same day (small corrections) is recorded in the last two sections; every tier was rerun
+on its library too.
 
 The difference-in-differences route, ported on 2026-11-13 and released as version 0.2.0,
 is validated in the two sections dated 2026-11-13, with scripts and result files of its own
@@ -995,3 +997,67 @@ byte for byte.
 Run times with up to five jobs at a time: Tier A 12 min, B and C about a minute each,
 D 15 min; the route's tiers A 10 min, B and C under a minute each, D 29 min;
 `run-tests.do` 6 min; the two R scripts 16 and 20 min.
+
+## 2026-11-20 development build after 0.2.1: small corrections to the difference-in-differences route
+
+Not a release: the version strings still say 0.2.1. The library was rebuilt from changed
+Mata sources (`lpowerape.mlib` md5 76998a4c56c0704633dd952ac54da575; the released 0.2.1
+library is 47e394ba...), so the version line of the logs below reads 0.2.1 although the
+library is this build.
+
+What changed:
+
+* **A design whose two parallel-trends scales coincide is valid under either analysis.**
+  With `gap(0)` or `trend(0)` and no covariates that move the outcome, parallel trends
+  mean the same on the index and on the probability scale. Such a design was still treated
+  as a mismatch when `trends()` and `analysis()` named different scales (`r(valid)` = 0, a
+  rejection rate, and `n`, `mde`, `powerat`, `alpha` and `statement` refused it). It is now
+  valid, and the design print says why.
+* The note under the design print says "centres near that covariate-free reading" when
+  the probit/logit analysis meets a linear world in a design with covariates.
+* `ppost()` on a panel gives a warning and is not stored in the design's rebuild string.
+  `didpilot` with `id()` and `design(cross-sections)` no longer passes the estimated
+  `rho()`, so it no longer warns about a `rho()` that was not given.
+* Help file: the exemption above, and a sentence that rates drifting over a pilot's
+  periods bias the estimated `rho()` downward.
+
+Rerun on this build, from the repository root:
+
+* `tests/did_port_identity_2026-11-13.do`: all 290 lines byte-identical to the 0.2.1 file.
+* Tiers A to D: 12/12, 171/171, 30/30 and 45/45 PASS; the route's tiers 31/31, 225/225,
+  235/235 and 53/53 PASS. Every results file and every log is byte-identical to the
+  committed file, except one note of three lines in `v_did_tierC.log` (the new wording for
+  a design with covariates).
+* `tests/run-tests.do`: 216 PASS, 0 FAIL (the 209 of 0.2.1 and 7 new: coinciding scales
+  under both analyses, the same power in both worlds on one seed, the search, a covariate
+  design that stays a mismatch, a panel design given `ppost()` in a sweep, and `didpilot`
+  with `id()` and `design(cross-sections)`).
+* `examples/showcase.do` runs without an error.
+
+Not rerun: the scratch `net install` and the two R reference scripts of the route.
+
+## 2026-11-20 version 0.2.2: the build of the previous section released
+
+Version 0.2.2 is the library of the previous section with the version strings changed
+and nothing else (`powerape.ado`, `pape_version()`, now "0.2.2 (Stata port of powerape
+1.12.2)", the header comment of `powerape_did.mata`, the help file, the package file and
+the showcase header). `build.do` rebuilt `lpowerape.mlib` (`powerape.ado` md5
+04851dae4f314fe4bcd4dc29663befd5 as the repository stores it, `lpowerape.mlib` md5
+007e37b2c1957e852914e60ca92f0cb3), and `powerape version` reports that the ado-file and
+the library agree. The R package has the same corrections from its version 1.12.2.
+
+Rerun on this library, from the repository root:
+
+* `tests/did_port_identity_2026-11-13.do`: the 288 seeded numbers are byte-identical to
+  the 0.2.1 file; the two printed statements differ only in the version they name.
+* Tiers A to D: 12/12, 171/171, 30/30 and 45/45 PASS; the route's tiers 31/31, 225/225,
+  235/235 and 53/53 PASS. Every results file is byte-identical to the 0.2.1 file. The
+  logs differ in the version line; `v_did_tierC.log` also in the one note of the
+  previous section.
+* The two R scripts of the route were rerun with the R package at 1.12.2
+  (`did_tierD_r.log` says so): every file in `validation/data/` is byte-identical.
+* `tests/run-tests.do`: 216 PASS, 0 FAIL. `examples/showcase.do` runs without an error
+  and prints version 0.2.2. A scratch `net install` gives version 0.2.2 with the ado-file
+  and the library in agreement: 5/5 PASS.
+
+The Distribution-Date of the package file is 20261120, the same day as 0.2.1.

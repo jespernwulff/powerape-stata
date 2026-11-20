@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.2.1  20nov2026}{...}
+{* *! version 0.2.2  20nov2026}{...}
 {vieweralsosee "[R] probit" "help probit"}{...}
 {vieweralsosee "[R] margins" "help margins"}{...}
 {vieweralsosee "[R] cfprobit" "help cfprobit"}{...}
@@ -120,7 +120,7 @@
 {title:Description}
 
 {pstd}
-{cmd:powerape} is a Stata port of the R package {bf:powerape} (version 1.12.1):
+{cmd:powerape} is a Stata port of the R package {bf:powerape} (version 1.12.2):
 simulation-based power analysis in which the effect size of interest is the
 average partial effect (APE) or the average interaction effect (AIE) of a
 probit or logit model. Targets are stated in probability points; the package
@@ -269,7 +269,10 @@ When {opt trends()} and {opt analysis()} name the same scale, {cmd:powerape powe
 reports power. When they differ, the analysis centres on another number than
 the ATT: {cmd:power} and {cmd:curve} then report a {bf:rejection rate} together
 with the mean of the estimates, and {cmd:n}, {cmd:mde}, {cmd:powerat},
-{cmd:alpha} and {cmd:statement} refuse the design or the result. With two
+{cmd:alpha} and {cmd:statement} refuse the design or the result. One case is
+exempt: with {cmd:gap(0)} or {cmd:trend(0)} and no covariates that move the
+outcome, parallel trends mean the same on both scales, the two worlds are the
+same world, and either analysis is treated as valid. With two
 periods and no covariates the data cannot tell the two scales apart, and the
 same four rates imply different effects under each (control .20 to .30 and
 treated .40 to .60 is an effect of .100 under linear trends, .074 on the
@@ -379,7 +382,11 @@ control group's rate; {opt group()} is the 0/1 indicator of the group that
 will be treated), {opt gap()}, {opt ptreated()} and, with {opt id()} and two
 or more periods per unit, {opt rho()} by the method of moments (the value at
 which the model's probability of the outcome in two periods of one unit equals
-the observed share of such pairs). All pre-treatment periods are pooled.
+the observed share of such pairs). All pre-treatment periods are pooled, which
+assumes flat rates over the pilot's periods: when the rates drift, {opt rho()}
+comes out too low (0.34 for a true 0.40 with rates that change by ten points a
+period), which lowers planned power. With {cmd:design(cross-sections)} the
+estimated {opt rho()} is not used.
 Pre-treatment data cannot show how the control group will change from before
 to after treatment, so {opt trend()} is required; with {opt period()} the
 control group's average change between pilot periods is reported as a guide.
@@ -646,6 +653,12 @@ difference-in-differences design has few units. All eight tiers were rerun:
 every results file is identical to 0.2.0. On one pilot file the converted
 {opt rho()} agrees with the R package's to 0.0003.
 
+{pstd}
+Version 0.2.2 (2026-11-20) follows version 1.12.2 of the R package: a
+difference-in-differences design whose two parallel-trends scales coincide is
+valid under either analysis, and several notes, warnings and help passages are
+corrected. All eight tiers were rerun: every results file is identical to 0.2.1.
+
 
 {title:References}
 
@@ -666,7 +679,7 @@ difference-in-differences with panel data. {it:The Econometrics Journal}
 {phang}Wooldridge, J. M. 2019. Correlated random effects models with
 unbalanced panels. {it:Journal of Econometrics} 211: 137-150.{p_end}
 {phang}Wulff, J. N. powerape: Power analysis for average partial effects. R
-package version 1.12.1. https://github.com/jespernwulff/powerape{p_end}
+package version 1.12.2. https://github.com/jespernwulff/powerape{p_end}
 
 
 {title:Author}

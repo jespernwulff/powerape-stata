@@ -674,6 +674,44 @@ matrix PG = r(pilot)
 check (r(rho) > 0.05 & r(rho) < PG[1, 10] - 0.02) "didpilot with covariates, logit: rho given the covariates lies below the raw correlation"
 clear
 
+* a design whose two scales coincide (no gap between the groups, or no change
+* in the control group, and no covariates) is valid under either analysis
+powerape dgp kv, did model(logit) baseline(0.20) gap(0) trend(0.10) design(cross-sections) trends(linear) nodisplay
+powerape setatt kv, target(0.08) nodisplay
+powerape power kv, n(1500) claim(detect) nsim(100) seed(4) engine(mata) nodisplay
+scalar pv_lin = r(power)
+check (r(valid) == 1) "did: no gap between the groups, the logit analysis is valid in the linear world"
+powerape dgp kvi, did model(logit) baseline(0.20) gap(0) trend(0.10) design(cross-sections) trends(index) nodisplay
+powerape setatt kvi, target(0.08) nodisplay
+powerape power kvi, n(1500) claim(detect) nsim(100) seed(4) engine(mata) nodisplay
+check (r(power) == scalar(pv_lin)) "did: with coinciding scales the two worlds give the same power on one seed"
+capture noisily powerape n kv, claim(detect) nsim(100) seed(5) engine(mata) nodisplay
+check (_rc == 0 & r(n) > 1000) "did: the search takes a design with coinciding scales"
+powerape dgp kv2, did model(probit) baseline(0.20) gap(0.15) trend(0) trends(index) analysis(linear) nodisplay
+powerape setatt kv2, target(0.08) nodisplay
+powerape power kv2, n(600) claim(detect) nsim(40) seed(4) engine(mata) nodisplay
+check (r(valid) == 1) "did: no change in the control group, the linear analysis is valid in the index world"
+powerape dgp kv3, did model(logit) baseline(0.20) gap(0) trend(0.10) trends(linear) covariates((z, normal)) signal(0.3) nint(100000) nodisplay
+powerape setatt kv3, target(0.08) nodisplay
+powerape power kv3, n(600) claim(detect) nsim(40) seed(4) engine(mata) nodisplay
+check (r(valid) == 0) "did: with a covariate that moves the outcome the mismatch stays a mismatch"
+* ppost() on a panel is not stored, and a unit identifier with
+* design(cross-sections) passes no rho()
+powerape dgp kv4, did model(logit) baseline(0.25) gap(0.10) trend(0.08) rho(0.3) ppost(0.4) nodisplay
+powerape setatt kv4, target(0.07) nodisplay
+capture noisily powerape robust kv4, n(1500) claim(detect) vary(rho(0.2 0.5)) gridpoints(2) nsim(20) seed(10) nonmax engine(mata) nodisplay
+check (_rc == 0) "did: a panel design given ppost() can be swept"
+set seed 63
+set obs 2000
+generate long firm = _n
+generate byte treated = runiform() < 0.4
+expand 2
+bysort firm: generate byte year = _n
+generate byte y = runiform() < cond(treated, 0.34, 0.22)
+powerape dgp kv5, didpilot outcome(y) group(treated) id(firm) period(year) trend(0.05) design(cross-sections) nodisplay
+check ("`r(design)'" == "cross-sections" & r(rho) == 0) "didpilot: a unit identifier with design(cross-sections) gives repeated cross-sections without rho()"
+clear
+
 powerape drop _all
 di as txt _n "run-tests: $PAPE_NPASS PASS, $PAPE_NFAIL FAIL"
 if $PAPE_NFAIL > 0 {

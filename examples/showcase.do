@@ -1,4 +1,4 @@
-* showcase.do -- a guided tour of powerape for Stata (version 0.2.1)
+* showcase.do -- a guided tour of powerape for Stata (version 0.2.2)
 *
 * Run it top to bottom (five to ten minutes on this machine, depending on
 * what else is running) or step through it in the Do-file Editor. Every

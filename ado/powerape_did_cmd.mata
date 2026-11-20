@@ -146,8 +146,7 @@ void pape_print_did_dgp(struct pape_dgp scalar x)
             printf("  the same eight rates read under linear-parallel trends: difference %s (their triple cross difference)\n", pape_fsgn(lin[2] - lin[1]))
         else
             printf("  the same eight rates read on the %s index: difference %s (covariate-free reading)\n", x.model, pape_fsgn(idx[2] - idx[1]))
-        if (!pape_did_valid(x))
-            printf("  note: the analysis assumes %s-parallel trends, so it centres on that reading, not on the true difference\n", x.analysis)
+        pape_did_scale_note(x, "the true difference")
     }
     else {
         printf("  true ATT pinned at %s (treatment coefficient = %6.4f)\n", pape_fsgn(x.target_est), x.did_de[1])
@@ -155,8 +154,7 @@ void pape_print_did_dgp(struct pape_dgp scalar x)
             printf("  the same four rates read under linear-parallel trends: %s (their cross difference)\n", pape_fsgn(lin[1]))
         else
             printf("  the same four rates read on the %s index: %s (covariate-free reading)\n", x.model, pape_fsgn(idx[1]))
-        if (!pape_did_valid(x))
-            printf("  note: the analysis assumes %s-parallel trends, so it centres on that reading, not on the ATT\n", x.analysis)
+        pape_did_scale_note(x, "the ATT")
     }
 }
 
@@ -216,7 +214,7 @@ string scalar pape_did_spec(string scalar model, real rowvector baseline, real r
     if (cols(trend) > 0) s = s + " trend(" + pape_numlist(trend) + ")"
     s = s + " ptreated(" + strofreal(p_treated, "%21.0g") + ") design(" + design + ")"
     s = s + " rho(" + strofreal(rho, "%21.0g") + ")"
-    if (p_post != .) s = s + " ppost(" + strofreal(p_post, "%21.0g") + ")"
+    if (p_post != . & design != "panel") s = s + " ppost(" + strofreal(p_post, "%21.0g") + ")"
     s = s + " trends(" + trends + ") analysis(" + analysis + ")"
     s = s + " npre(" + strofreal(n_pre, "%21.0g") + ") npost(" + strofreal(n_post, "%21.0g") + ")"
     if (sub_name != "") s = s + " subgroup(" + sub_name + ", binary p(" + strofreal(sub_p, "%21.0g") + "))"
@@ -486,7 +484,7 @@ void pape_cmd_dgp_didpilot(string scalar name, string scalar yvar, string scalar
         rho = rho_in
         if (panel) over = over + " rho"
     }
-    else rho = (rho_hat == . ? 0 : rho_hat)
+    else rho = (rho_hat == . | design == "cross-sections" ? 0 : rho_hat)
     if (rows(y) < 500)
         printf("{err}warning: the pilot has fewer than 500 rows: the estimated rates and the within-unit correlation are imprecise. Vary them with powerape robust before relying on a sample size.\n")
     Cm = (corr_kind == 2 ? st_matrix(corr_matname) : J(0, 0, .))

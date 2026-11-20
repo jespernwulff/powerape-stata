@@ -1,6 +1,6 @@
 
 . di as txt "powerape `pav'; Stata `c(stata_version)' (`c(born_date)')"
-powerape 0.2.1 (Stata port of powerape 1.12.1); Stata 19.5 (14 Oct 2026)
+powerape 0.2.2 (Stata port of powerape 1.12.2); Stata 19.5 (14 Oct 2026)
 
 . import delimited data/did-reference.csv, clear varnames(1) stringcols(1 2) as
 > double
@@ -280,8 +280,9 @@ powerape DGP -- probit, difference-in-differences (two periods)
   true ATT pinned at +0.0700 (treatment coefficient = 0.1975)
   the same four rates read on the probit index: +0.0599 (covariate-free reading
 > )
-  note: the analysis assumes index-parallel trends, so it centres on that readi
-> ng, not on the ATT
+  note: the analysis assumes index-parallel trends, so it centres near that cov
+> ariate-free reading (not exactly on it, because the design has covariates), n
+> ot on the ATT
 true ATT of DGP c7 on the integration set:          .07
 
 . powerape dgp c6big, did model(logit) baseline(0.25) gap(0.10) trend(0.08) rho
